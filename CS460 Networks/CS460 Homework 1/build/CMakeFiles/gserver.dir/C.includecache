@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/kelvinrodriguez/Repos/Class_Work/CS460 Networks/CS460 Homework 1/server.c
+pthread.h
+-
+server.h
+/Users/kelvinrodriguez/Repos/Class_Work/CS460 Networks/CS460 Homework 1/server.h
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+
+/Users/kelvinrodriguez/Repos/Class_Work/CS460 Networks/CS460 Homework 1/server.h
+stdio.h
+-
+stdlib.h
+-
+sys/socket.h
+-
+unistd.h
+-
+netinet/in.h
+-
+
