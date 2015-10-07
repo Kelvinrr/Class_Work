@@ -27,16 +27,14 @@ size_t BUFFER_SIZE = 256;
 size_t NUM_CONEECTIONS = 10;
 size_t MAX = 1024;
 
-#define true 1
-#define false !true
-
 // main, the only funtion in the program
 int main(int argc, char *argv[]) {
     // declare some stuff //
     int    host_sock;
     int    portno;
     int    num_to_guess;
-    int    serv_guess = 0;
+    int    serv_guess       = 0;
+    int    last_space_index = 0;
     time_t curr_time;
     size_t serv_mess_len;
     char   serv_message[BUFFER_SIZE];
@@ -80,32 +78,24 @@ int main(int argc, char *argv[]) {
     while ((serv_mess_len = read(host_sock, serv_message, sizeof(serv_message)-1)) > 0) {
         serv_message[serv_mess_len] = 0;
         printf("Server - %s", serv_message);
+            
+        // find the index of last space (' ') and punctuation ('?') //
+        for (int i = 0; i < strlen(serv_message); i++)
+            if (serv_message[i] == ' ')
+                last_space_index = i;
+            
+        memcpy(serv_message, &serv_message[last_space_index], 4);
+        serv_guess = atoi(serv_message);
         
-        /* Parse User Server Message */ {
-            int last_space_index = 0;
-            int question_mark_index = 0;
-            
-            // find the index of last space and the punctuation mark (e.g. '?') //
-            for (int i = 0; i < strlen(serv_message); i++) {
-                if (serv_message[i] == ' ')
-                    last_space_index = i;
-                else if (serv_message[i] == '?')
-                    question_mark_index = i;
-            }
-            
-            memcpy(serv_message, &serv_message[last_space_index], 4 );
-            serv_guess = atoi(serv_message);
-            
-            if (num_to_guess > serv_guess) {
-                write(host_sock, "y", sizeof(char));
-                printf("Client - y\n");
-            } else if(guess_count < floor(log(MAX)/log(2))) {
-                write(host_sock, "n", sizeof(char));
-                printf("Client - n\n");
-            }
-            
-            guess_count++;
+        if (num_to_guess > serv_guess) {
+            write(host_sock, "y", sizeof(char));
+            printf("Client - y\n");
+        } else if(guess_count < log(MAX)/log(2)) {
+            write(host_sock, "n", sizeof(char));
+            printf("Client - n\n");
         }
+            
+        guess_count++;
     }
     ///////////////////////////////////////////////////
     if(num_to_guess == serv_guess) {
