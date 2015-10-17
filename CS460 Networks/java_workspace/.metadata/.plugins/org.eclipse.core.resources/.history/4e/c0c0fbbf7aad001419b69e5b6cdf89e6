@@ -1,0 +1,126 @@
+package CS249_Project1;
+
+
+/**
+ * Queue class, this class was named QueueKR because Queue was 
+ * already taken.
+ * @author kr788
+ *
+ */
+public class QueueKR {
+
+	private int[] array;
+	private int front;
+	private int rear;
+	private int numItems;
+	
+	/**
+	 * Default Constructor
+	 */
+	QueueKR(){
+		array = new int[10];
+		front = 0;
+		rear = -1;
+	}
+	
+	/**
+	 * Parameterized constructor that sets the size of the Queue
+	 * @param size the size of the queue
+	 * @throws Exception generic exception if the size is less than 1
+	 */
+	public QueueKR(int size) throws Exception{
+		if(size < 1)
+			throw new Exception("Error: Queue Size");
+	
+		array = new int[size];
+		front = 0;
+		rear = -1;
+	}
+	
+	/**
+	 * Add an Element to the front of the Queue
+	 * @param newElement element to add to the Queue
+	 * @throws Exception Generic exception if the Queue is full
+	 */
+	public void add(int newElement) throws Exception{
+		if(numItems == array.length)
+			throw new Exception("Error: Add");
+		
+		rear = (rear < array.length-1) ? rear+1 : 0; 
+		numItems++;
+		array[rear] = newElement;
+	}
+	
+	/**
+	 * Removes the first item from the Queue
+	 * @return Element in front of the Queue
+	 * @throws Exception Generic exception if the Queue is Empty
+	 */
+	public int remove() throws Exception{
+		if(numItems < 1)
+			throw new Exception("Error: remove");
+		
+		int temp = array[front];
+		front = (front < array.length-1) ? front+1 : 0;
+		numItems--;
+		return temp;
+	}
+	
+	/**
+	 * Prints out the the queue in proper order
+	 */
+	public void display(){
+		if(numItems == 0){
+			System.out.println("This Queue is empty.");
+			return;
+		}
+		
+		for(int i = front; i != rear; i = (i < array.length-1) ? i+1 : 0)
+			System.out.print(array[i] + ",");
+		System.out.println(array[rear]);
+	}
+	
+	
+	public static void main(String[] args){
+		try {
+			QueueKR q = new QueueKR(4);
+			
+			//Display the empty queue//////
+			q.display();
+			System.out.println();
+			///////////////////////////////
+			
+			//Display with one item////////
+			q.add(2);
+			q.display();
+			System.out.println();
+			///////////////////////////////
+			
+			//Display a full Queue with no
+			//wrap around//////////////////
+			q.add(5);
+			q.add(10);
+			q.add(12);
+			q.display();
+			System.out.println();
+			///////////////////////////////
+			
+			q.remove();
+			q.remove();
+			
+			q.display();
+			
+			q.add(100);
+			q.add(1123);
+			
+			System.out.println();
+			q.display();
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	
+}

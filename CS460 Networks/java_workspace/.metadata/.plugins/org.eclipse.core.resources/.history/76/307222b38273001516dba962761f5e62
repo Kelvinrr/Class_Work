@@ -1,0 +1,39 @@
+package server;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+
+
+
+
+public class NumberGuessingServer implements Runnable{ 
+    private int server_port = 23657;
+    private ServerSocket socket;
+    
+    
+    public static void main(){
+    	
+    }
+
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		try {
+			this.socket = new ServerSocket(this.server_port);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+    
+    
+    
+    
+    
+}

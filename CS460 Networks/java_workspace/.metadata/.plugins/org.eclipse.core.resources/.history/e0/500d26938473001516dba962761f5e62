@@ -1,0 +1,70 @@
+package server;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+/** 
+ * @description 
+ * 		A multi-threaded server that plays a number guessing game
+ * 		with a client
+ * @author Kelvin Rodriguez, Franklin Berry
+ */
+public class NumberGuessingServer implements Runnable{ 
+    private int server_port = 23657;
+    private ServerSocket server_socket;
+    private Socket client_socket;
+
+	@Override
+	public void run() {
+		try {
+			this.server_socket = new ServerSocket(this.server_port);
+		} catch (IOException e) {
+			System.out.println("Failed to open server at port " + this.server_port);
+		}
+	}
+	
+	/**
+	 * handle_clinet 
+	 * @description
+	 * 		Method that plays the number guessing game. 
+	 * 		It's Self-explanitory
+	 * 
+	 * @input Socket object for client 
+	 * @output Not a darn thing
+	 * */
+	public void handle_client(Socket client_socket) throws IOException{
+		
+	    int fence = 1024/2;
+	    int increment = 1024/2;
+	    int number = 0;
+	    InputStream input_stream = client_socket.getInputStream();
+	    OutputStream output_stream = client_socket.getOutputStream();
+		
+	    while(increment > 0) {
+	    	output_stream.write(("Is your number higher than " + fence + "?").getBytes());
+	    	char response = (char) input_stream.read();
+	    	
+	    	if (response == 'q')
+	    		break; // quit
+	    	
+	    	if (response == 'y') {
+	    	    number += increment;
+	    	    increment /= 2;
+	    	    fence += increment;
+	    	} else {
+	    		increment /= 2;
+	    		fence -= increment;
+	    	}	
+	    	
+	    }
+	    
+	    number++;
+	    output_stream.write(("Is your number " + number + "?").getBytes());
+	    
+	    input_stream.close();
+	    output_stream.close();
+	}
+    
+}  // end of NumberGuessingServer class

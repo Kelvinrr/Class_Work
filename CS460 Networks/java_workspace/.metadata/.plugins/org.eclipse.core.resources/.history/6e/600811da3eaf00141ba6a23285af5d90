@@ -1,0 +1,35 @@
+package CS249_Project1;
+
+public class Dequeue {
+
+	private int[] array;
+	private int leftPtr;
+	private int rightPtr;
+	private int numItems;
+	
+	public boolean insertRight(int newElement){
+		return true;
+	}
+	
+	public boolean insertLeft(int newElement){
+		return false;
+	}
+	
+	public int removeRight(){
+		return 1;
+	}
+	
+	public int removeLeft(){
+		return 2;
+	}
+	
+	public boolean isEmpty(){
+		return (numItems == 0);
+	}
+	
+
+	
+	
+	
+	
+}

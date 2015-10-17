@@ -1,0 +1,170 @@
+/**
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
+
+package CS249_Project1;
+
+import java.util.Arrays;
+import java.util.function.Consumer;
+
+/**
+ * 
+ * @author kr788
+ *
+ */
+public class Dequeue {
+
+	private int[] array;
+	private int leftPtr;
+	private int rightPtr;
+	private int numItems;
+	
+	/**
+	 * 
+	 */
+	public Dequeue(){
+		array = new int[10];
+		rightPtr = -1;
+		leftPtr = -1;
+		numItems = 0;
+	}
+
+	/**
+	 * 
+	 * @param size
+	 * @throws Exception
+	 */
+	public Dequeue(int size) throws Exception{
+		if(size < 1)
+			throw new Exception("Error: Queue Size");
+		
+		array = new int[size];
+		rightPtr = -1;
+		leftPtr = -1;
+		numItems = 0;
+	}
+	
+	/**
+	 * 
+	 * @param newElement
+	 * @return
+	 */
+	public boolean insertRight(int newElement){
+		if(isFull())
+			return false;
+
+		rightPtr = (rightPtr < array.length-1) ? ++rightPtr : 0; 
+		numItems++;
+		array[rightPtr] = newElement;
+		
+		return true;
+		
+	}
+	
+	/**
+	 * 
+	 * @param newElement
+	 * @return
+	 */
+	public boolean insertLeft(int newElement){
+		if(isFull())
+			return false;
+
+		leftPtr = (leftPtr > 0) ? --leftPtr : array.length-1; 
+		numItems++;
+		array[leftPtr] = newElement;
+		return true;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public int removeRight() throws Exception{
+		if(isEmpty())
+			throw new Exception("Dequeue is Empty.");
+		
+		int temp = array[rightPtr];
+		rightPtr = (rightPtr > 0) ? --rightPtr : array.length-1; 
+		return temp;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public int removeLeft() throws Exception{
+		if(isEmpty())
+			throw new Exception("Dequeue is Empty.");
+		
+		int temp = array[rightPtr];
+		leftPtr = (leftPtr < array.length-1) ? ++leftPtr : 0;  
+		return temp;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isEmpty(){
+		return (numItems == 0);
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isFull(){
+		return (numItems == array.length);
+	}
+	
+	/**
+	 * Prints Dequeue from left pointer to right pointer to standard output
+	 */
+	public void display(){
+		if(numItems == 0){
+			System.out.println("This Dequeue is empty.");
+			return;
+		}
+		
+		for(int i = leftPtr; i != rightPtr; i = (i < array.length-1) ? ++i : 0)
+			System.out.print(array[i] + ",");
+		System.out.println(array[rightPtr]);
+	}
+	
+	/**
+	 * 
+	 * @param args
+	 * @throws Exception 
+	 */
+	public static void main(String[] args) throws Exception{
+		
+		// local lambda for printing queue info
+		Consumer<Dequeue> printAttributes = (q) -> {
+			System.out.print("Queue Print: ");
+			q.display();
+			System.out.println("Array Print: " + Arrays.toString(q.array));
+			System.out.println("Right Pointer = " + q.rightPtr);
+			System.out.println("Left Pointer = " + q.leftPtr);
+			System.out.println("Element Count = " + q.numItems);
+		};
+		
+		Dequeue q = new Dequeue(4);
+		q.insertRight(10);
+		q.insertLeft(3);
+		printAttributes.accept(q);
+		q.insertLeft(5);
+		q.insertRight(3234);
+		System.out.println();
+		printAttributes.accept(q);
+	}
+	
+}

@@ -1,0 +1,58 @@
+package CS249_Project1;
+
+public class QueueKR {
+
+	private int[] array;
+	private int front;
+	private int rear;
+	private int numItems;
+	
+	
+	QueueKR(){
+		array = new int[10];
+		front = 0;
+		rear = -1;
+	}
+	
+	public QueueKR(int size) throws Exception{
+		
+		if(size < 1)
+			throw new Exception();
+	
+		array = new int[size];
+		front = 0;
+		rear = -1;
+	}
+	
+	public void add(int newElement) throws Exception{
+		if(numItems == array.length)
+			throw new Exception();
+		
+		rear = (rear < 1) ? array.length-1 : rear-1; 
+		array[rear] = newElement;
+	}
+	
+	public int remove() throws Exception{
+		if(numItems < 1)
+			throw new Exception();
+		
+		int temp = array[front];
+		front = (front < array.length-1) ? front+1 : 0;
+		return temp;
+	}
+	
+	public void display(){
+		
+		
+	}
+	
+	
+	public static void main(String[] args){
+		
+		
+		
+		
+	}
+	
+	
+}

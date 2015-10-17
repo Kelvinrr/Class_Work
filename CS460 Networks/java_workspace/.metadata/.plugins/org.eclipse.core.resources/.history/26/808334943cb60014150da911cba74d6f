@@ -1,0 +1,61 @@
+package CS249_Project1;
+
+public class CircList{
+
+	private Node current;          // ref to current node
+	private Node prev;
+	private int count;           // # of nodes on list
+
+
+    public CircList() {             // constructor
+		count = 0;                         // no nodes in the list yet
+		current = null;
+    }
+
+
+    public void insert(long id) {   // insert  node before current
+
+			// COMPLETE THIS METHOD
+
+    }
+
+    public Node delete() {         // delete current node
+
+	// COMPLETE THIS METHOD
+
+    }
+
+    public Node find(long key) {     // find first node starting at  current with given key
+
+    	// COMPLETE THIS METHOD
+
+    }
+
+    public Node delete(long key){    // delete node with given key
+
+	// COMPLETE THIS METHOD
+
+    }
+  
+	public class Node{
+
+	   public long iData;              // data item (key)
+	   public Node next;              // next node in the list
+
+	   // -------------------------------------------------------------
+	   public Node(long id) {           // constructor
+	          iData = id;		// (next automatically null)
+	    }             
+
+	   // -------------------------------------------------------------
+	   public void displayNode() {     // display yourself
+	         System.out.print(iData + " ");
+	    }
+	  
+	 }  // end class Node
+
+
+}  // end class CircList
+
+
+

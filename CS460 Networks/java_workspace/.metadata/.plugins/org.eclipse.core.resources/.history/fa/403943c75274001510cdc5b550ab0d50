@@ -1,0 +1,105 @@
+/**
+ * NumberGuessingServer.java
+ * @author Kelvin Rodriguez & Franklin Berry
+ *
+ */
+package server;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+/**
+ * @description
+ * 		A multi-threaded server that plays a number guessing game
+ * 		with a client
+ * @author Kelvin Rodriguez, Franklin Berry
+ */
+public class NumberGuessingServer implements Runnable {
+    //////////////////////// Instance Variables ////////////////////////
+    private final int SERVER_PORT = 23653;
+    private ServerSocket server_socket;
+    //private Socket client_socket;
+    public Thread user_thread;
+
+    ///////////////////////////// Methods //////////////////////////////
+    @Override
+    /** Runs the server */
+    public void run() {
+    	System.out.println("Starting Server");
+    	synchronized(this) {
+    		user_thread = Thread.currentThread();
+    	}
+    	
+    	try {
+    		this.server_socket = new ServerSocket(this.SERVER_PORT);
+    	} catch (IOException e) {
+    		System.out.println("Failed to open server at port " + this.SERVER_PORT);
+    	}
+    	while(true){
+    		try {
+				//client_socket = server_socket.accept();
+				handle_client();
+				
+			} catch (IOException e) {
+				System.out.println("Failed to accept client socket");
+			}
+    	
+    		new Thread(this).start();
+    	}
+	}
+
+	/**
+	 * handle_clinet
+	 * @description
+	 * 		Method that plays the number guessing game.
+	 * 		It's Self-explanatory
+	 *
+	 * @input Socket object for client
+	 * @return Not a darn thing (i.e void)
+	 * */
+	public synchronized void handle_client() throws IOException{
+		Socket client_socket;
+		client_socket = server_socket.accept();
+    	
+		
+	    int fence 		= 1024/2;
+	    int increment 	= 1024/2;
+	    int number 		= 0;
+	    InputStream  input_stream  = client_socket.getInputStream();
+	    OutputStream output_stream = client_socket.getOutputStream();
+
+	    while(increment >  0) {
+	    	output_stream.write(
+                ("Is your number higher than " + fence + "?\n").getBytes());
+	    	byte response[] = new byte[3];
+	    	input_stream.read(response);
+	    	
+	    	if ((char)response[0] == 'q')
+	    		break; // quit
+
+	    	if ((char)response[0] == 'y') {
+	    	    number += increment;
+	    	    increment /= 2;
+	    	    fence  += increment;
+	    	} else {
+	    		increment /= 2;
+	    		fence -= increment;
+	    	}
+	    }  // End of while(increment > 0) loop
+
+	    number++;
+	    output_stream.write(("Is your number " + number + "?\n").getBytes());
+
+	    input_stream.close();
+	    output_stream.close();
+	    client_socket.close();
+	}
+	
+	public static void main(String[] args) {
+		new Thread(new NumberGuessingServer()).start();
+	}
+	
+
+}  // end of NumberGuessingServer class

@@ -1,0 +1,75 @@
+/**
+ * NumberGuessingServer.java
+ * @author Kelvin Rodriguez & Franklin Berry
+ *
+ */
+package server;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.io.IOException;
+/**
+ * @description
+ * 		A multi-threaded server that plays a number guessing game
+ * 		with a client
+ * @author Kelvin Rodriguez, Franklin Berry
+ */
+public class NumberGuessingServer implements Runnable {
+    //////////////////////// Instance Variables ////////////////////////
+    private final int SERVER_PORT = 23666;
+    private ServerSocket server_socket;
+    private Socket client_socket;
+    public Thread user_thread;
+
+    ///////////////////////////// Methods //////////////////////////////
+    public NumberGuessingServer(){
+    }
+    
+    public NumberGuessingServer(Socket client_socket){
+    	this.client_socket = client_socket;
+    }
+    
+    @Override
+    /** Runs the server */
+    public void run() {
+    	System.out.println("Starting Server");
+    	synchronized(this) {
+    		this.user_thread = Thread.currentThread();
+    	}
+    	
+    	try {
+    		this.server_socket = new ServerSocket(this.SERVER_PORT);
+    	} catch (IOException e) {
+    		System.out.println("Failed to open server at port " + this.SERVER_PORT);
+    	}
+    	while(true) {
+    		/*Scanner in = new Scanner(System.in);
+    		String std_in = in.nextLine();
+    		if(std_in.equals("q")){
+    			try {
+    				System.out.println("Closing socket");
+					server_socket.close();
+				} catch (IOException e) {
+					System.out.println("Couldn't close socket");
+				}
+    		    System.exit(0);
+    		}*/
+    	   
+    		try {
+				client_socket = server_socket.accept();
+				
+			} catch (IOException e) {
+				System.out.println("Failed to accept client socket");
+			}
+    	
+    		new Thread(new NumberGuessingGame(client_socket)).start();
+    	}
+	}
+
+	
+	public static void main(String[] args) {
+		new Thread(new NumberGuessingServer()).start();
+		
+	}
+	
+
+}  // end of NumberGuessingServer class
