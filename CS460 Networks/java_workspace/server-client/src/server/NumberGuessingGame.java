@@ -47,7 +47,6 @@ public class NumberGuessingGame implements Runnable {
 	    	try {
 				output_stream.write(
 				    ("Is your number higher than " + fence + "?\n").getBytes());
-
 		    	
 		    	input_stream.read(response);
 
@@ -62,7 +61,7 @@ public class NumberGuessingGame implements Runnable {
 		    		increment /= 2;
 		    		fence -= increment;
 		    	}
-		  
+
 	    	}catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -73,7 +72,7 @@ public class NumberGuessingGame implements Runnable {
 	    try {
 	    	if((char)response[0] != 'q')
 				output_stream.write(("Is your number " + number + "?\n").getBytes());
-	   
+
 		    input_stream.close();
 		    output_stream.close();
 		    if(!client_socket.isClosed())

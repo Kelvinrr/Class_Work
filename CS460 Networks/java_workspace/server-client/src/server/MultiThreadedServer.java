@@ -45,7 +45,7 @@ public class MultiThreadedServer implements Runnable {
      *      Runs the server */
     public synchronized void run() {
     	System.out.println("Starting Server");
-    	
+
     	try {
     		this.server_socket = new ServerSocket(this.SERVER_PORT);
     	} catch (IOException e) {
@@ -53,24 +53,25 @@ public class MultiThreadedServer implements Runnable {
                 + this.SERVER_PORT+ " exiting...");
     		System.exit(0);
     	}
-    	
+
+        ///////////// Server loop /////////////
     	while(!server_is_stopped) {
     		try {
 				client_socket = server_socket.accept();
 	    		System.out.println("\nAccepted Client:");
 	    		System.out.println(client_socket + "\n");
-	    	
+
 			} catch (IOException e) {
 				if(!server_is_stopped)
 					System.out.println("Error accepting a client...");
 			}
-    		
     		new Thread(new NumberGuessingGame(client_socket)).start();
     	}
+        ////////////////////////////////////////
 	}
 
     /**
-     * 
+     *
      *
      */
 	public void shutdown(){
@@ -120,7 +121,7 @@ public class MultiThreadedServer implements Runnable {
 	public static void main(String[] args) {
 		MultiThreadedServer server = new MultiThreadedServer();
 	  	ServerMenu menu = new ServerMenu(server);
-	  	
+
 		new Thread(server).start();
 		new Thread(menu).start();
 	}

@@ -41,7 +41,7 @@ public class NumberGuessingClient {
         InputStream input_stream = this.server_socket.getInputStream();
         OutputStream output_stream = this.server_socket.getOutputStream();
 
-        /////// Client Loop ///////
+        /////// Server Loop ///////
         while(input_stream.read(buffer) >= 0) {
         	buffer_string = new String(buffer);
         	System.out.println(buffer_string);
