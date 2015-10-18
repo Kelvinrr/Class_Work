@@ -1,0 +1,10 @@
+package client;
+
+public class NumberGuessingClient {
+	
+	private String host_name;
+	private int port_number;
+	private Socket server_socket;
+	
+
+}

@@ -1,0 +1,127 @@
+/**
+ * MultiThreadedServer.java
+ * @author Kelvin Rodriguez & Franklin Berry */
+package server;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Scanner;
+
+import javax.swing.plaf.synth.SynthSpinnerUI;
+
+import java.io.IOException;
+
+/**
+ * @description
+ * 		A multi-threaded server that plays a number guessing game
+ * 		with a client.
+ * @author
+ *      Kelvin Rodriguez and Franklin Berry.
+ *      Fun fact: Kelvin is very handsom. */
+public class MultiThreadedServer implements Runnable {
+    //////////////////////// Instance Variables ////////////////////////
+    private final int SERVER_PORT = 23667;
+    private ServerSocket server_socket;
+    private Socket client_socket;
+    private Thread user_thread;
+    ///////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////// Methods //////////////////////////////
+    /**
+     * @Description
+     *      default constructor, it is very default-y */
+    public MultiThreadedServer() {
+    }
+
+    /**
+     * @Description
+     *      Parameterized constructor. It's parameterized, it's a
+     *      a contructor, it's a parameterized constructor!*/
+    public MultiThreadedServer(Socket client_socket) {
+    	this.client_socket = client_socket;
+    }
+
+    @Override
+    /**
+     * @Description
+     *      Runs the server */
+    public void run() {
+    	System.out.println("Starting Server");
+    	synchronized(this) {
+    		this.user_thread = Thread.currentThread();
+    	}
+
+    	try {
+    		this.server_socket = new ServerSocket(this.SERVER_PORT);
+    	} catch (IOException e) {
+    		System.out.println("Failed to open server at port "
+                + this.SERVER_PORT);
+    	}
+    	
+    	while(true) {
+    		try {
+				client_socket = server_socket.accept();
+			} catch (IOException e) {
+				System.out.println("Failed to accept client socket");
+			}
+  
+    		System.out.println("Accepted A Client");
+    		new Thread(new NumberGuessingGame(client_socket)).start();
+    	}
+	}
+
+    /**
+     * 
+     *
+     */
+	public void shutdown(){
+    	try{
+    		if(this.server_socket!= null)
+    			this.server_socket.close();
+    		if(this.client_socket != null)
+    			this.client_socket.close();
+    	}catch(Exception e){
+
+    	}
+    }
+    ///////////////////////////////////////////////////////////////////////
+
+	///////////////////////// Setters and Getters /////////////////////////
+    public ServerSocket getServer_socket() {
+		return server_socket;
+	}
+
+	public void setServer_socket(ServerSocket server_socket) {
+		this.server_socket = server_socket;
+	}
+
+	public Socket getClient_socket() {
+		return client_socket;
+	}
+
+	public void setClient_socket(Socket client_socket) {
+		this.client_socket = client_socket;
+	}
+
+	public Thread getUser_thread() {
+		return user_thread;
+	}
+
+	public void setUser_thread(Thread user_thread) {
+		this.user_thread = user_thread;
+	}
+	///////////////////////////////////////////////////////////////////////
+	
+
+    ///////////////////////////// Main Method /////////////////////////////
+    /**
+     * @Description
+     *      The main method, it thinks very highly of itself.
+     *      It creates the initial thread. */
+	public static void main(String[] args) {
+		MultiThreadedServer server = new MultiThreadedServer();
+	  	ServerMenu menu = new ServerMenu(server);
+    	new Thread(menu).start();
+		new Thread(new MultiThreadedServer()).start();
+		server.shutdown();
+	}
+}  // end of MultiThreadedServer class

@@ -1,0 +1,9 @@
+package client;
+
+public class NumberGuessingClient {
+	
+	private String host_name;
+	
+	
+
+}

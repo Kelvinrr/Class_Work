@@ -38,14 +38,14 @@ int main(int argc, char *argv[]) {
     time_t curr_time;
     size_t serv_mess_len;
     char   serv_message[BUFFER_SIZE];
-    
+
     struct sockaddr_in serv_addr;
 
     if (argc < 3) {
         printf("Usage: gclient [Host Address] [Port Number]");
         return 1;
     }
-    
+
     // initialize some of that stuff //
     memset(&serv_addr,   '0', sizeof(serv_addr));
     memset(serv_message, '0', sizeof(serv_message));
@@ -53,13 +53,13 @@ int main(int argc, char *argv[]) {
     host_sock            = socket(AF_INET, SOCK_STREAM, 0);
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port   = htons(portno);
-    
+
     inet_pton(AF_INET, argv[1], &serv_addr.sin_addr);
-    
+
     // Print Server Connection Info //
     printf("Client Address: %s\n", argv[1]);
     printf("Port Number: %d\n\n" , portno);
-    
+
     // Connect //
     if (connect(host_sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) >= 0) {
         printf("Connected...\n\n");
@@ -67,26 +67,26 @@ int main(int argc, char *argv[]) {
         printf("Failed to connect.");
         return 1;
     }
-    
+
     // Generate a number for the server to guess //
     srand((unsigned) time(&curr_time));
     num_to_guess = rand()%1024+1;
     printf("Number server has to guess: %d\n\n", num_to_guess);
-    
+
     int guess_count = 0;
     // Server Loop ////////////////////////////////////
     while ((serv_mess_len = read(host_sock, serv_message, sizeof(serv_message)-1)) > 0) {
         serv_message[serv_mess_len] = 0;
         printf("Server - %s", serv_message);
-            
-        // find the index of last space (' ') and punctuation ('?') //
+
+        // find the index of last space (' ') //
         for (int i = 0; i < strlen(serv_message); i++)
             if (serv_message[i] == ' ')
                 last_space_index = i;
-            
+
         memcpy(serv_message, &serv_message[last_space_index], 4);
         serv_guess = atoi(serv_message);
-        
+
         if (num_to_guess > serv_guess) {
             write(host_sock, "y", sizeof(char));
             printf("Client - y\n");
@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
             write(host_sock, "n", sizeof(char));
             printf("Client - n\n");
         }
-            
+
         guess_count++;
     }
     ///////////////////////////////////////////////////
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
         printf("Client's number: %d\n", num_to_guess);
         printf("\nYES, THE SERVER IS CORRECT!!!");
     }
-    
+
     close(host_sock);
     return 0;
 }
