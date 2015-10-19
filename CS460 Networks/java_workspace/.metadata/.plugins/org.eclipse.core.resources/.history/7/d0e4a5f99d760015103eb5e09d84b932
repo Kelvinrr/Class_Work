@@ -1,7 +1,7 @@
 /**
  * NumberGuessingClient.java
  * @Description
- *		Menu used to closes the server elegantly-ish
+ *		Menu used to cloes the server elegantly-ish
  * @author Kelvin Rodriguez & Franklin Berry */
 package server;
 
