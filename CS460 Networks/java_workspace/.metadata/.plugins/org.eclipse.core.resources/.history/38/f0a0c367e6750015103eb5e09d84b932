@@ -1,6 +1,3 @@
-/**
- * NumberGuessingClient.java
- * @author Kelvin Rodriguez & Franklin Berry */
 package client;
 
 import java.net.Socket;

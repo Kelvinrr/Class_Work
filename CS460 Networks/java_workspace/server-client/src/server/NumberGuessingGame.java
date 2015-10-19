@@ -1,3 +1,6 @@
+/**
+ * NumberGuessingGame.java
+ * @author Kelvin Rodriguez & Franklin Berry */
 package server;
 
 import java.io.IOException;
@@ -47,7 +50,7 @@ public class NumberGuessingGame implements Runnable {
 	    	try {
 				output_stream.write(
 				    ("Is your number higher than " + fence + "?\n").getBytes());
-		    	
+
 		    	input_stream.read(response);
 
 		    	if ((char)response[0] == 'q')

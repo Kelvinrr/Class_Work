@@ -1,14 +1,19 @@
+/**
+ * NumberGuessingClient.java
+ * @Description
+ *		Menu used to cloes the server elegantly-ish
+ * @author Kelvin Rodriguez & Franklin Berry */
 package server;
 
 import java.util.Scanner;
 
 public class ServerMenu implements Runnable {
-	private MultiThreadedServer server; 
-	
+	private MultiThreadedServer server;
+
 	public ServerMenu(MultiThreadedServer server) {
 		this.server = server;
 	}
-	
+
 	@Override
 	public void run() {
 		Scanner keyboard = new Scanner(System.in);
@@ -17,11 +22,11 @@ public class ServerMenu implements Runnable {
 			System.out.println("Type \"Stop\" at anytime to stop the server");
 			input = keyboard.nextLine();
 		}while(!input.equalsIgnoreCase("Stop"));
-		
+
 		server.shutdown();
 		keyboard.close();
-		
+
 		System.out.println("Server has shutdown.");
 		System.exit(0);
-	} 
+	}
 }

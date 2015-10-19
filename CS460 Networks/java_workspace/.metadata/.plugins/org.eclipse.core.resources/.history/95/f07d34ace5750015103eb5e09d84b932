@@ -1,6 +1,3 @@
-/**
- * NumberGuessingClient.java
- * @author Kelvin Rodriguez & Franklin Berry */
 package client;
 
 import java.net.Socket;
@@ -20,7 +17,7 @@ public class NumberGuessingClient {
 
 	public void play_game() throws IOException {
 		try{
-			server_socket = new Socket("localhost", 23656);
+			server_socket = new Socket("localhost", 23657);
 		}
 		catch (Exception e){
 			System.out.println("The server is not responding... exiting");

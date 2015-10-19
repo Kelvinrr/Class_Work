@@ -1,6 +1,3 @@
-/**
- * NumberGuessingClient.java
- * @author Kelvin Rodriguez & Franklin Berry */
 package client;
 
 import java.net.Socket;
@@ -78,8 +75,8 @@ public class NumberGuessingClient {
         else
         	System.err.println("The guess is wrong...");
 
-        if(!server_socket.isClosed())
-			server_socket.close();
+        //if(!server_socket.isClosed())
+		//	server_socket.close();
 	}
 
 	/* The Client's main method, it's more smug than the server's main method */

@@ -15,7 +15,6 @@
 /*
  * main()
  */
-
 int main(int argc, char** argv) {
     int server_socket;                  // descriptor of server socket
     struct sockaddr_in server_address;  // naming the server's listening socket
@@ -45,23 +44,23 @@ int main(int argc, char** argv) {
         perror("Error listening on socket");
         exit(EXIT_FAILURE);
     }
-
+    
+    printf("Server started...\n");
     // server loop
     while (TRUE) {
         pthread_mutex_lock(&mutex);
         // accept connection to client
         if ((*client_socket = accept(server_socket, NULL, NULL)) == -1) {
             perror("Error accepting client");
+            close(*client_socket);
         } else {
             printf("\nAccepted client\n");
-
             pthread_t a_thread;
 
             if (pthread_create(&a_thread, NULL, handle_client, (void*)client_socket) != 0) {
                 perror("Thread creation failed");
                 exit(EXIT_FAILURE);
             }
-            //handle_client(*client_socket);
         }
     }  // end of server loop
 }  // end of main
@@ -104,17 +103,16 @@ void *handle_client(void* client_socket) {
     }  //End while loop
 
     number++;
-    sprintf(output_string, "Is your number is %d?\n", number);
+    sprintf(output_string, "Is your number %d?\n", number);
     write(client, output_string, sizeof(char)*strlen(output_string));
 
     // close the port ////////////////////////////////
-    if (close(client) == -1) {
-        perror("Error closing socket");
+    if (close(client) < 0) {
+        printf("Error closing socket");
         exit(EXIT_FAILURE);
-    } else {
-        printf("\nClosed socket to client, exit");
     }
-
+    
+    printf("\nClosed client socket.");
     pthread_exit("Thread closed");
     ///////////////////////////////////////////////////
 }  // end of handle_client

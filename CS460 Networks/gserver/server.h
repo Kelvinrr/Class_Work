@@ -16,11 +16,12 @@
 
 pthread_mutex_t mutex;
 /* Function prototypes */
+void *server_menu(void* server_socket);
 void *handle_client(void* client_socket);
 
 /* Preprocessor directives */
 #define SERVER_ADDR "127.0.0.1" // for client
-#define PORT 23657  // port the server will listen on
+#define PORT 23656  // port the server will listen on
 #define MAX 1024
 
 #define FALSE 0
