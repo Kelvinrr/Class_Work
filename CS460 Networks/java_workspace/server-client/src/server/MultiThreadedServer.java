@@ -1,6 +1,7 @@
 /**
  * MultiThreadedServer.java
- * @author Kelvin Rodriguez & Franklin Berry */
+ * @author Kelvin Rodriguez & Franklin Berry
+ */
 package server;
 
 import java.net.ServerSocket;
@@ -15,7 +16,7 @@ import java.io.IOException;
  *      Kelvin Rodriguez and Franklin Berry.
  *      Fun fact: Kelvin is very handsom. */
 public class MultiThreadedServer implements Runnable {
-    //////////////////////// Instance Variables ////////////////////////
+    ////////////////////////// Instance Variables /////////////////////////
     private final int SERVER_PORT = 23659;
     private ServerSocket server_socket;
     private Socket client_socket;
@@ -23,7 +24,7 @@ public class MultiThreadedServer implements Runnable {
     private boolean server_is_stopped;
     ///////////////////////////////////////////////////////////////////////
 
-    ///////////////////////////// Methods //////////////////////////////
+    /////////////////////////////// Methods ///////////////////////////////
     /**
      * @Description
      *      default constructor, it is very default-y */
@@ -34,7 +35,7 @@ public class MultiThreadedServer implements Runnable {
     /**
      * @Description
      *      Parameterized constructor. It's parameterized, it's a
-     *      a constructor, it's a parameterized constructor!*/
+     *      a constructor, it's a parameterized constructor! */
     public MultiThreadedServer(Socket client_socket) {
     	this.client_socket = client_socket;
     }
@@ -60,7 +61,6 @@ public class MultiThreadedServer implements Runnable {
 				client_socket = server_socket.accept();
 	    		System.out.println("\nAccepted Client:");
 	    		System.out.println(client_socket + "\n");
-
 			} catch (IOException e) {
 				if(!server_is_stopped)
 					System.out.println("Error accepting a client...");
@@ -74,14 +74,14 @@ public class MultiThreadedServer implements Runnable {
      *
      *
      */
-	public void shutdown(){
-    	try{
+	public void shutdown() {
+    	try {
     		this.server_is_stopped = true;
     		if(this.server_socket != null && !server_socket.isClosed())
     			this.server_socket.close();
     		if(this.client_socket != null && !client_socket.isClosed())
     			this.client_socket.close();
-    	}catch(Exception e){
+    	} catch(Exception e) {
 
     	}
     }
@@ -117,7 +117,8 @@ public class MultiThreadedServer implements Runnable {
     /**
      * @Description
      *      The main method, it has a smug sense of self-importance...
-     *      It creates the initial thread. */
+     *      It creates the initial thread.
+     */
 	public static void main(String[] args) {
 		MultiThreadedServer server = new MultiThreadedServer();
 	  	ServerMenu menu = new ServerMenu(server);
