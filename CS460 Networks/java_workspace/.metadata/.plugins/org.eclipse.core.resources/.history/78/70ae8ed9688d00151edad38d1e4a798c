@@ -1,0 +1,11 @@
+package client;
+
+import dk.vajhoej.record.Alignment;
+import dk.vajhoej.record.Endian;
+import dk.vajhoej.record.FieldType;
+import dk.vajhoej.record.Struct;
+
+
+public class Datagram {
+	
+}
