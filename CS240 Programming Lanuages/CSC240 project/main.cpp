@@ -1,51 +1,32 @@
-//
-//  main.cpp
-//  CSC240 project
-//
-//  Created by Kelvin Rodriguez on 10/23/14.
-//  Copyright (c) 2014 Kelvin.rodriguez. All rights reserved.
-//
+import java.util.Arrays;
+public class MyRecursiveKnapsack implements RecursiveKnapsack {
 
-#include <iostream>
-#include "Sorting.h"
 
-int main() {
-    // lambda function for printing the menu.
-    auto print_menu = [](int& input, Vector_Smart_Ptr& array){
-        array = get_random_vector();
-        std::cout << "What do you want to run?" << std::endl
-                  << "------------------------" << std::endl
-                  << "1. Bubble Sort"           << std::endl
-                  << "2. Selection Sort"        << std::endl
-                  << "3. Insertion Sort"        << std::endl
-                  << "4. quit"                  << std::endl
-                  << "------------------------" << std::endl;
-        std::cout << "-->";
-        std::cin  >> input;
-
-        switch (input) {
-            case 1:
-                print_function_timing(array, bubble_sort);
-                break;
-            case 2:
-                print_function_timing(array, selection_sort);
-                break;
-            case 3:
-                print_function_timing(array, insertion_sort);
-                break;
-            case 4:
-                 std::cout << "Ok, I'll miss you..." << std::endl;
-                break;
-            default:
-                std::cout << "Incorrect input, try again" << std::endl;
-                break;
-        }
-    };
-
-    int input;
-    Vector_Smart_Ptr array;
-
-    do {
-    print_menu(input, array);
-    } while (input != 4);
+    @Override
+    public int[] getKnapsackSolution(int[] weights, int targetweight) {
+      
+      //Base Case
+      //No Soln if there is too much weight in the bad
+      if(targetweight < 0) return new int[]{-1};
+      
+      //only 1 weight left to try
+      if(weights.length == 1){
+         if(weights[0] == targetweight) return weights;
+         else return new int[]{-1};
+      }
+      
+      //Recursive Work---//
+      int[] posSoln = getKnapsackSolution(Arrays.copyOfRange(weights, 1, weights.length), targetweight - weights[0]);
+      
+      //seeing if the weights[0] is in solution 
+      if(posSoln.length > 1 || (posSoln.length == 1 && posSoln[0] != -1)){
+         int[] soln = getKnapsackSolution(Arrays.copyOfRange(posSoln, 0, posSoln.length + 1), targetweight);
+         
+         soln[soln.length - 1] = weights[0];
+         return soln;
+      } else {
+         return getKnapsackSolution(Arrays.copyOfRange(weights, 1, weights.length), targetweight);
+      }
+      
+    }   
 }
