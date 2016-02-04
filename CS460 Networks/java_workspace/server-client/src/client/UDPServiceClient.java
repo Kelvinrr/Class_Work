@@ -5,7 +5,7 @@ import java.net.*;
 import java.util.Arrays;
 
 class UDPServiceClient {
-	public static final int DEFAULT_PORT = 9890;
+	public static final int DEFAULT_PORT = 9865;
 	
 	public static final char CMD_ECHO 	= 'e';
 	public static final char CMD_DNS 	= 'd';
@@ -43,11 +43,13 @@ class UDPServiceClient {
 			
 			// create UDP socket
 			clientSocket = new DatagramSocket();
-			InetAddress IPAddress = InetAddress.getByName("134.114.9.128");
+			InetAddress IPAddress = InetAddress.getByName("localhost");
 			
 			// send the data
 			DatagramPacket sendPacket = new DatagramPacket(buffer, buffer.length, IPAddress, DEFAULT_PORT);
 			clientSocket.send(sendPacket);
+			
+			buffer = new byte[255];
 			
 			// wait for server response
 			receivePacket = new DatagramPacket(buffer, buffer.length);
