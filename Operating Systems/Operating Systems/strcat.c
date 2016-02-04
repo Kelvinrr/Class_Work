@@ -2,7 +2,7 @@
 //  strcat.c
 //  Operating Systems
 //
-//  Created by Kelvin Rodriguez on 2/3/16.
+//  Created by Kelvin Rodriguez & Eric Huff on 2/3/16.
 //  Copyright © 2016 Kelvin.rodriguez. All rights reserved. I have lawyers.
 //
 
