@@ -10,7 +10,7 @@ default: $(TARGET)
 all: default
 
 #HEADERS =
-LIBS = -libc -libm
+LIBS = -lm
 
 OBJECTS = $(patsubst %.cpp, %.o, $(wildcard *.cpp))
 
@@ -20,7 +20,7 @@ OBJECTS = $(patsubst %.cpp, %.o, $(wildcard *.cpp))
 %.o: %.c
 	$(CC) $(CPPFLAGS) -c $< -o $@
 
-$(TARGET): $(OBJECTS)
+$(TARGET): $(OBJECTS) main.c
 	$(CC) main.c -Wall $(LIBS) -o $@
 
 clean:
