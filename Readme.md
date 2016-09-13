@@ -1,4 +1,4 @@
 #Class Work
 
 
-Collection of university work
+Collection of university class work
