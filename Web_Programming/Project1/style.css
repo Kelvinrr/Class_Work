@@ -1,0 +1,31 @@
+p {
+    text-align: justify;
+    color: #333333;
+    margin-left: 21%;
+    margin-right: 21%;
+    font-family: "Old Standard TT", serif;
+}
+
+h1 {
+    font-size: 325%;
+    text-align: center;
+    color: #444444;
+    font-family: "Old Standard TT", serif;
+}
+
+h5 {
+    font-weight: normal;
+    font-size: 110%;
+    text-align: center;
+    color: #333333;
+    font-family: "Old Standard TT", serif;
+}
+
+footer {
+  font-size: 50%;
+  text-align: justify;
+  color: #555555;
+  margin-left: 21%;
+  margin-right: 21%;
+  font-family: "Old Standard TT", serif;
+}
