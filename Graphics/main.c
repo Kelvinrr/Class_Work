@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 // globals
 static const char usage_str[] =
@@ -18,19 +19,22 @@ static const char usage_str[] =
 
 static const size_t INIT_BUFFER_SIZE = 255;
 
+void from_binary(char* buffer, size_t width, size_t height,
+                 FILE* input_file, FILE* output_file);
+
 int main (int argc, char* argv[]) {
   // Check Args ------------------------------------------------
   if (argc == 1) {
     printf("%s", usage_str);
   }
 
-  if (argc != 3) {
+  if (argc != 4) {
     printf("ERROR: Incorrect number of parameters\n");
     exit(0);
   }
 
-  char* input_file_path = argv[1];
-  char* output_file_path = argv[2];
+  char* input_file_path = argv[2];
+  char* output_file_path = argv[3];
   char* buffer = (char*)malloc(sizeof(char)*INIT_BUFFER_SIZE);
   FILE* input_fd = fopen(input_file_path, "r");
 
@@ -63,7 +67,47 @@ int main (int argc, char* argv[]) {
 
   printf("Dimensions = %ld %ld\n", width, height);
 
-  // realloc buffer to read one line at a time
-  buffer = realloc(buffer, width);
+  fgets(buffer, INIT_BUFFER_SIZE, input_fd);
+  size_t max_val = strtol(buffer, NULL, 10);
 
+  printf("Maximum Value = %ld\n", max_val);
+
+  // realloc buffer to read one line at a time
+  buffer = realloc(buffer, width*3);
+
+  // Start Reading/Writing bytes -----------------------------------------
+  FILE* output_file = fopen(output_file_path, "w");
+
+  // attach header
+  fputs(argv[1], output_file);
+  sprintf(buffer, "\n%ld %ld\n", width, height);
+  fputs(buffer, output_file);
+  sprintf(buffer, "%ld\n", max_val);
+  fputs(buffer, output_file);
+
+  // attach pixel data
+  from_binary(buffer, width, height, input_fd, output_file);
+}
+
+
+void from_binary(char* buffer, size_t width, size_t height,
+                    FILE* input_file, FILE* output_file) {
+
+  unsigned char* unint8_buffer = (unsigned char*)buffer;
+
+  for (size_t i = 0; i < height; i++) {
+    fread(unint8_buffer, width*3, 1, input_file);
+    for (size_t j = 0; j < width; j++) {
+      sprintf(buffer, "%u ", unint8_buffer[3*j]);
+      fputs(buffer, output_file);
+      sprintf(buffer, "%u ", unint8_buffer[3*j+1]);
+      fputs(buffer, output_file);
+      sprintf(buffer, "%u\n",unint8_buffer[3*j+2]);
+      fputs(buffer, output_file);
+    } // end of inner for loop
+  }  // end of outer for loop
+} // end of from_binary
+
+void from_ascii() {
+  
 }
