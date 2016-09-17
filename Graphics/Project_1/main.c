@@ -6,6 +6,7 @@
  *
  *
  */
+#define _GNU_SOURCE
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -51,19 +52,24 @@ int main (int argc, char* argv[]) {
   FILE* input_fd = fopen(input_file_path, "rb");
   if (!input_fd) {
     fprintf(stderr, "ERROR: Failed to open file %s\n", input_file_path);
-    exit(-1);
+    return -1;
+    fclose(input_fd);
   }
 
   FILE* output_file = fopen(output_file_path, "w");
   if (!input_fd) {
     fprintf(stderr, "ERROR: Failed to open file %s\n", output_file_path);
-    exit(-1);
+    fclose(output_file);
+    fclose(input_fd);
+    return -1;
   }
 
   char* buffer = (char*)malloc(sizeof(char)*INIT_BUFFER_SIZE);
   if (!buffer) {
     fprintf(stderr, "ERROR: Failed to allocate buffer\n");
-    exit(-1);
+    fclose(output_file);
+    fclose(input_fd);
+    return -1;
   }
 
   // Get the Magic Number and check for validity ---------------
@@ -76,6 +82,9 @@ int main (int argc, char* argv[]) {
 
   if (strcmp(file_format, "P3") && strcmp(file_format, "P6")) {
     fprintf(stderr, "ERROR: This is not a valid format\n");
+    fclose(output_file);
+    fclose(input_fd);
+    return -1;
   }
 
   // Skiping comments ... --------------------------------------
@@ -88,6 +97,8 @@ int main (int argc, char* argv[]) {
   char* splitstr = strtok(buffer, " ");
   if (!splitstr) {
     fprintf(stderr, "ERROR: invalid width");
+    fclose(output_file);
+    fclose(input_fd);
     return -1;
   }
   size_t width = strtol(splitstr, NULL, 10);
@@ -95,6 +106,8 @@ int main (int argc, char* argv[]) {
   splitstr = strtok(NULL, " ");
   if (!splitstr) {
     fprintf(stderr, "ERROR: invalid height");
+    fclose(output_file);
+    fclose(input_fd);
     return -1;
   }
   size_t height = strtol(splitstr, NULL, 10);
@@ -113,7 +126,9 @@ int main (int argc, char* argv[]) {
   }
 
   if (max_val < 1) {
-    fprintf(stderr,"ERROR: Max value cannot be less than 1");
+    fprintf(stderr,"ERROR: Max value cannot be less than 1\n");
+    fclose(output_file);
+    fclose(input_fd);
     return -1;
   }
 
@@ -122,6 +137,8 @@ int main (int argc, char* argv[]) {
   buffer = realloc(buffer, data_buffer_size);
   if (!buffer) {
     fprintf(stderr, "ERROR: Not enough memory to open image\n");
+    fclose(output_file);
+    fclose(input_fd);
     return -1;
   }
 
@@ -131,6 +148,8 @@ int main (int argc, char* argv[]) {
   if (strcmp(file_format, "P6") == 0) {
     if (!(size = check_bin_image_size(width, height, input_fd))) {
       fprintf(stderr, "ERROR: Real image size does not match header.\n");
+      fclose(output_file);
+      fclose(input_fd);
       return -1;
     }
   } // end of checking P6 integrity
@@ -138,6 +157,8 @@ int main (int argc, char* argv[]) {
   if (strcmp(file_format, "P3") == 0) {
     if (!(size = check_ascii_image_size(width, height, buffer, INIT_BUFFER_SIZE, input_fd))) {
       fprintf(stderr, "ERROR: Real image size does not match header.\n");
+      fclose(output_file);
+      fclose(input_fd);
       return -1;
     }
   } // end of checking P6 integrity
