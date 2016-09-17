@@ -6,8 +6,8 @@ This is my general class work repo, to see the graphics assignment, simply go to
 The Project_1 directory has the code along with a tst_data directory with the images used to test my application and the Makefile to build it.
 
 commands for making the application
-build: make
-clean: make clean
+build: `make`
+clean: `make clean`
 
 The arguments taken are exactly the same as mentioned in the project instructions. As I am not a graduate student, this only supports P3 and P6. 
 
