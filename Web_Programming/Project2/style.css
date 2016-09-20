@@ -14,6 +14,7 @@ img {
   height: auto;
   width: auto;
   display: block;
+  position: inherit;;
   margin-left: auto;
   margin-right: auto;
   max-width: 100%;
@@ -32,12 +33,16 @@ img {
   margin-right: -50%;
   font-family: 'Open Sans', sans-serif;
   font-weight: lighter;
+  margin-top: 2%;
 }
 
 .header-links a {
     color: #340069;
     font-size: 75%;
+    margin-bottom: 5%;
+    margin-top: 3%;
 }
+
 h1 {
     font-size: 325%;
     text-align: center;
