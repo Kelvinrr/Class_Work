@@ -11,6 +11,7 @@ h1 {
     text-align: center;
     color: #444444;
     font-family: "Old Standard TT", serif;
+    margin-bottom: 3%;
 }
 
 H4 {
@@ -29,6 +30,7 @@ h5 {
     text-align: center;
     color: #333333;
     font-family: "Old Standard TT", serif;
+    margin-bottom: 2%;
 }
 
 footer {
@@ -38,4 +40,20 @@ footer {
   margin-left: 21%;
   margin-right: 21%;
   font-family: "Old Standard TT", serif;
+}
+
+.header-links {
+  word-spacing: 100px;
+  text-align: center;
+  margin-left: -50%;
+  margin-right: -50%;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: lighter;
+  margin-top: 1%;
+  margin-bottom: 5%;
+}
+
+.header-links a {
+    color: #340069;
+    font-size: 75%;
 }

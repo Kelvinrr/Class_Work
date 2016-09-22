@@ -1,6 +1,5 @@
 body {
   /*background-color: #340069;*/
-  background-color: #ffffff
 }
 
 .row-centered {
@@ -11,6 +10,7 @@ body {
     display: inline-block;
     float: none;
     text-align: left;
+
 }
 
 .header-links {
@@ -22,6 +22,11 @@ body {
   font-weight: lighter;
   margin-bottom: 5%;
   margin-top: 1%;
+}
+
+.header-links a{
+  color: #340069;
+  font-size: 75%;
 }
 
 .radio {
