@@ -1,0 +1,27 @@
+.header-links {
+  word-spacing: 100px;
+  text-align: center;
+  margin-left: -50%;
+  margin-right: -50%;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: lighter;
+  margin-top: 2%;
+}
+
+.header-links a {
+    color: #340069;
+    font-size: 75%;
+    margin-bottom: 5%;
+    margin-top: 1%;
+}
+
+footer {
+  font-size: 75%;
+  text-align: justify;
+  color: #555555;
+  margin-left: 21%;
+  margin-right: 21%;
+  font-family: "Old Standard TT", serif;
+  position: fixed;
+  bottom: 0;
+}
