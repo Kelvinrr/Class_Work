@@ -1,6 +1,6 @@
 ### Test MakeFile for experimenting ###
 CC = gcc
-TARGET = ppmrw
+TARGET = tracer
 
 CPPFLAGS = -g -Wall
 
@@ -10,17 +10,13 @@ default: $(TARGET)
 all: default
 
 LIBS = -lm
-
 OBJECTS = $(patsubst %.cpp, %.o, $(wildcard *.cpp))
-
-#HEADERS = Iincs/
-#SYSHEADERS = $(subst -iframework ,-F,$(subst -isystem ,-I,$(HEADERS)))
 
 %.o: %.c
 	$(CC) $(CPPFLAGS) -c $< -o $@
 
-$(TARGET): $(OBJECTS) main.c
-	$(CC) main.c -Wall $(LIBS) -o $@
+$(TARGET): $(OBJECTS) tracer.c
+	$(CC) tracer.c -Wall $(LIBS) -o $@
 
 clean:
 	-rm -f *.o

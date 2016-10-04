@@ -1,5 +1,6 @@
 typedef double* V3;
 
+
 static inline void v3_add(V3 a, V3 b, V3 c) {
   c[0] = a[0] + b[0];
   c[1] = a[1] + b[1];
@@ -30,4 +31,8 @@ static inline void v3_cross(V3 a, V3 b, V3 c) {
   c[0] = a[1]*b[2] - a[2]*b[1];
   c[1] = a[2]*b[0] - a[0]*b[2];
   c[2] = a[0]*b[1] - a[1]*b[0];
+}
+
+size_t percentile_in_range(size_t min, size_t max, size_t val) {
+  return (val - min)/(max - min);
 }
