@@ -133,7 +133,6 @@ Object **read_scene(char *filename) {
 
   size_t curr_obj = 0;
   while (1) {
-    printf("%zu\n", curr_obj);
     obj_array[curr_obj] = malloc(sizeof(Object));
 
     c = fgetc(json);
@@ -191,12 +190,34 @@ Object **read_scene(char *filename) {
           // Scaler types
           if (strcmp(key, "width") == 0) {
             double value = next_number(json);
+            if (value < 0) {
+              fprintf(stderr, "Error: Width cannot be less than 0. Found %lf "
+                              "on line number %d.\n",
+                      value, line);
+              exit(1);
+            }
+
             obj_array[curr_obj]->Camera.width = value;
+
           } else if (strcmp(key, "height") == 0) {
             double value = next_number(json);
+            if (value < 0) {
+              fprintf(stderr, "Error: Height cannot be less than 0. Found %lf "
+                              "on line number %d.\n",
+                      value, line);
+              exit(1);
+            }
+
             obj_array[curr_obj]->Camera.height = value;
           } else if (strcmp(key, "radius") == 0) {
             double value = next_number(json);
+            if (value < 0) {
+              fprintf(stderr, "Error: Radius cannot be less than 0. Found %lf "
+                              "on line number %d.\n",
+                      value, line);
+              exit(1);
+            }
+
             obj_array[curr_obj]->Sphere.radius = value;
           }
 
@@ -204,6 +225,13 @@ Object **read_scene(char *filename) {
           else if (strcmp(key, "color") == 0) {
             double *value = next_vector(json);
             obj_array[curr_obj]->color.r = value[0];
+            if (value[0] < 0 || value[1] < 0 || value[2] < 0) {
+              fprintf(stderr, "Error: color values cannot be less than 0. "
+                              "On line number %d.\n",
+                      line);
+              exit(1);
+            }
+
             obj_array[curr_obj]->color.g = value[1];
             obj_array[curr_obj]->color.b = value[2];
           } else if (strcmp(key, "position") == 0) {

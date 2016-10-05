@@ -115,8 +115,6 @@ int main(int argc, char *argv[]) {
   double pixheight = h / M;
   double pixwidth = w / N;
 
-  printf("%d %d\n", M, N);
-
   for (int y = 0; y < M; y += 1) {
     for (int x = 0; x < N; x += 1) {
       double Ro[3] = {0, 0, 0};
