@@ -9,6 +9,11 @@
 #include "pplib.h"
 #include "tracer.h"
 
+/**
+ * Simple function that calculates the intersection with a
+ * sphere. Based on the formula found in the text
+ * provided by the class
+ */
 double sphere_intersection(double *Ro, double *Rd, double *Center, double r) {
   double a = (sqr(Rd[0]) + sqr(Rd[1]) + sqr(Rd[2]));
   double b = (2 * (Ro[0] * Rd[0] - Rd[0] * Center[0] + Ro[1] * Rd[1] -
@@ -34,6 +39,11 @@ double sphere_intersection(double *Ro, double *Rd, double *Center, double r) {
   return -1;
 }
 
+/**
+ * Simple function that calculates the intersection with a
+ * plane. Based on the formula found in the text
+ * provided by the class
+ */
 double plane_intersection(double *Ro, double *Rd, double *position,
                           double *normal) {
   // distance = dot(Po-Lo,N)/dot(L,N)
@@ -51,15 +61,18 @@ double plane_intersection(double *Ro, double *Rd, double *position,
 
 int main(int argc, char *argv[]) {
 
+  // check if args are within range
   if (argc < 5) {
     fprintf(stderr, "Error: Not enough arguements\n");
     exit(1);
   }
 
+  // get the width and height
   int img_width = strtol(argv[1], (char **)NULL, 10);
   int img_height = strtol(argv[2], (char **)NULL, 10);
   char *input_json = argv[3];
 
+  // open the output file for reading
   FILE *output_ppm = fopen(argv[4], "wb");
   if (!output_ppm) {
     fprintf(stderr, "ERROR: Failed to open file %s\n", argv[4]);
@@ -67,15 +80,32 @@ int main(int argc, char *argv[]) {
     return -1;
   }
 
+  // init the color objexts for later
   Pixel color = {.r = 0, .g = 0, .b = 0};
   Pixel black = {.r = 0, .g = 0, .b = 0};
 
+  // get the array of object pointers
   Object **objects = read_scene(input_json);
+
+  double h = 2;
+  double w = 2;
+  int num_cams = 0;
+  // look for the camera
+  for (int i = 0; objects[i] != 0; i++) {
+    if (objects[i]->type == 0) {
+      w = objects[i]->Camera.width;
+      h = objects[i]->Camera.height;
+      num_cams++;
+    }
+  }
+  if (num_cams != 1) {
+    fprintf(stderr, "ERROR: Incorrect number of cameras specified, must have "
+                    "1. Found: %d\n",
+            num_cams);
+  }
 
   double cx = 0;
   double cy = 0;
-  double h = 2;
-  double w = 2;
 
   int M = img_width;
   int N = img_height;
