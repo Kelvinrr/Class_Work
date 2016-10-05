@@ -5,38 +5,7 @@
 
 #include "VectorMath.h"
 #include "pplib.h"
-
-const TYPE_CAMERA = 0;
-
-// Plymorphism in C
-
-typedef struct {
-  int kind;
-  double color[3];
-  union {
-    struct {
-      double center[3];
-      double radius;
-    } cylinder;
-    struct {
-      double center[3];
-      double radius;
-    } sphere;
-    struct {
-      double normal[3];
-      double position[3];
-    } plane;
-  };
-} Object;
-
-static inline double sqr(double v) { return v * v; }
-
-static inline void normalize(double *v) {
-  double len = sqrt(sqr(v[0]) + sqr(v[1]) + sqr(v[2]));
-  v[0] /= len;
-  v[1] /= len;
-  v[2] /= len;
-}
+#include "tracer.h"
 
 double sphere_intersection(double *Ro, double *Rd, double *Center, double r) {
   double a = (sqr(Rd[0]) + sqr(Rd[1]) + sqr(Rd[2]));
@@ -78,7 +47,8 @@ double plane_intersection(double *Ro, double *Rd, double *position,
   return 0;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+
   Pixel color = {.r = 0, .g = 255, .b = 0};
   Pixel black = {.r = 0, .g = 0, .b = 0};
 
@@ -87,10 +57,10 @@ int main() {
   objects[0] = malloc(sizeof(Object));
 
   objects[0]->kind = 1;
-  objects[0]->sphere.center[0] = 0;
-  objects[0]->sphere.center[1] = 0;
-  objects[0]->sphere.center[2] = 20;
-  objects[0]->sphere.radius = 2;
+  objects[0]->Sphere.position[0] = 0;
+  objects[0]->Sphere.position[1] = 0;
+  objects[0]->Sphere.position[2] = 20;
+  objects[0]->Sphere.radius = 2;
 
   objects[1] = NULL;
 
@@ -133,12 +103,12 @@ int main() {
 
         switch (objects[i]->kind) {
         case 0:
-          t = plane_intersection(Ro, Rd, objects[i]->plane.position,
-                                 objects[i]->plane.normal);
+          t = plane_intersection(Ro, Rd, objects[i]->Plane.position,
+                                 objects[i]->Plane.normal);
           break;
         case 1:
-          t = sphere_intersection(Ro, Rd, objects[i]->sphere.center,
-                                  objects[i]->sphere.radius);
+          t = sphere_intersection(Ro, Rd, objects[i]->Sphere.position,
+                                  objects[i]->Sphere.radius);
           break;
         default: // error
           exit(1);
