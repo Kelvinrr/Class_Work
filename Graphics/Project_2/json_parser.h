@@ -1,13 +1,14 @@
+#ifndef _VECTOR_MATH_H_
+#define _VECTOR_MATH_H_
+
+#include <ctype.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "VectorMath.h"
-#include "dictionary.h"
 #include "tracer.h"
-
-#define DEBUG 1
 
 int line = 1;
 const uint8_t INIT_NUM_OBJ = 64;
@@ -84,7 +85,7 @@ char *next_string(FILE *json) {
 
 double next_number(FILE *json) {
   double value;
-  fscanf(json, "%f", &value);
+  fscanf(json, "%lf", &value);
   // Error check this..
   return value;
 }
@@ -113,15 +114,16 @@ double *next_vector(FILE *json) {
  *
  *
  */
-void read_scene(char *filename) {
+Object **read_scene(char *filename) {
   int c;
   FILE *json = fopen(filename, "r");
-  Object *obj_array = malloc(sizeof(Object) * INIT_NUM_OBJ);
-
   if (json == NULL) {
     fprintf(stderr, "Error: Could not open file \"%s\"\n", filename);
     exit(1);
   }
+
+  Object **obj_array;
+  obj_array = malloc(sizeof(Object *) * INIT_NUM_OBJ);
 
   skip_ws(json);
 
@@ -131,14 +133,14 @@ void read_scene(char *filename) {
 
   size_t curr_obj = 0;
   while (1) {
-    char *key = malloc(sizeof(256));
-    char *value = malloc(sizeof(256));
+    printf("%zu\n", curr_obj);
+    obj_array[curr_obj] = malloc(sizeof(Object));
 
     c = fgetc(json);
     if (c == ']') {
       fprintf(stderr, "Error: This is the worst scene file EVER.\n");
       fclose(json);
-      return;
+      return NULL;
     }
     if (c == '{') {
       skip_ws(json);
@@ -158,11 +160,11 @@ void read_scene(char *filename) {
       char *value = next_string(json);
 
       if (strcmp(value, "camera") == 0) {
-        obj_array[curr_obj].type = CAMERA;
+        obj_array[curr_obj]->type = CAMERA;
       } else if (strcmp(value, "sphere") == 0) {
-        obj_array[curr_obj].type = SPHERE;
+        obj_array[curr_obj]->type = SPHERE;
       } else if (strcmp(value, "plane") == 0) {
-        obj_array[curr_obj].type = PLANE;
+        obj_array[curr_obj]->type = PLANE;
       } else {
         fprintf(stderr, "Error: Unknown type, \"%s\", on line number %d.\n",
                 value, line);
@@ -189,38 +191,41 @@ void read_scene(char *filename) {
           // Scaler types
           if (strcmp(key, "width") == 0) {
             double value = next_number(json);
-            obj_array[curr_obj].Camera.width = value;
-
+            obj_array[curr_obj]->Camera.width = value;
           } else if (strcmp(key, "height") == 0) {
             double value = next_number(json);
-            obj_array[curr_obj].Camera.height = value;
+            obj_array[curr_obj]->Camera.height = value;
           } else if (strcmp(key, "radius") == 0) {
             double value = next_number(json);
-            obj_array[curr_obj].Camera.radius = value;
+            obj_array[curr_obj]->Sphere.radius = value;
           }
 
           // Vector types
           else if (strcmp(key, "color") == 0) {
             double *value = next_vector(json);
-            v3_cpy(obj_array[curr_obj].color, value);
+            obj_array[curr_obj]->color.r = value[0];
+            obj_array[curr_obj]->color.g = value[1];
+            obj_array[curr_obj]->color.b = value[2];
           } else if (strcmp(key, "position") == 0) {
             double *value = next_vector(json);
 
-            if (obj_array[curr_obj].type == PLANE) {
-              v3_cpy(obj_array[curr_obj].Plane.position, value);
-            } else if (obj_array[curr_obj].type == SPHERE) {
-              v3_cpy(obj_array[curr_obj].Sphere.position, value);
+            if (obj_array[curr_obj]->type == PLANE) {
+              v3_cpy(obj_array[curr_obj]->Plane.position, value);
+            } else if (obj_array[curr_obj]->type == SPHERE) {
+              v3_cpy(obj_array[curr_obj]->Sphere.position, value);
             } else {
               fprintf(stderr, "Error: Unknown type, \"%d\", on line %d.\n",
-                      obj_array[curr_obj].type, line);
+                      obj_array[curr_obj]->type, line);
+              exit(1);
             }
 
           } else if (strcmp(key, "normal") == 0) {
             double *value = next_vector(json);
-            v3_cpy(obj_array[curr_obj].Plane.normal, value);
+            v3_cpy(obj_array[curr_obj]->Plane.normal, value);
           } else {
             fprintf(stderr, "Error: Unknown property, \"%s\", on line %d.\n",
                     key, line);
+            exit(1);
           }
 
           skip_ws(json);
@@ -236,11 +241,15 @@ void read_scene(char *filename) {
         skip_ws(json);
       } else if (c == ']') {
         fclose(json);
-        return;
+        obj_array[curr_obj + 1] = 0;
+        return obj_array;
       } else {
         fprintf(stderr, "Error: Expecting ',' or ']' on line %d.\n", line);
         exit(1);
       }
     }
+    curr_obj++;
   }
 }
+
+#endif

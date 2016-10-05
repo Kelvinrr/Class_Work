@@ -7,15 +7,15 @@
 
  {
  "type": "sphere",
- "color": [1.0, 0, 0],
- "position": [0, 2, 5],
+ "color": [255, 0, 0],
+ "position": [-1, 1, 5],
  "radius": 2
  },
 
  {
  "type": "plane",
- "color": [0, 0, 1.0],
- "position": [0, 0, 0],
- "normal": [0, 1, 0]
+ "color": [0, 0, 255],
+ "position": [0, 2, 0],
+ "normal": [-1, 1, 0]
  }
 ]

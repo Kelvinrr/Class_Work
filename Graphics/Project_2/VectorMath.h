@@ -1,3 +1,6 @@
+#ifndef _VECTORMATH_H_
+#define _VECTORMATH_H_
+
 #include <math.h>
 
 typedef double *V3;
@@ -44,3 +47,5 @@ static inline void normalize(double *v) {
   v[1] /= len;
   v[2] /= len;
 }
+
+#endif

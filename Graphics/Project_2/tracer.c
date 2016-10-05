@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "json_parser.h"
+
 #include "VectorMath.h"
 #include "pplib.h"
 #include "tracer.h"
@@ -49,38 +51,34 @@ double plane_intersection(double *Ro, double *Rd, double *position,
 
 int main(int argc, char *argv[]) {
 
-  Pixel color = {.r = 0, .g = 255, .b = 0};
+  if (argc < 5) {
+    fprintf(stderr, "Error: Not enough arguements\n");
+    exit(1);
+  }
+
+  int img_width = strtol(argv[1], (char **)NULL, 10);
+  int img_height = strtol(argv[2], (char **)NULL, 10);
+  char *input_json = argv[3];
+
+  FILE *output_ppm = fopen(argv[4], "wb");
+  if (!output_ppm) {
+    fprintf(stderr, "ERROR: Failed to open file %s\n", argv[4]);
+    fclose(output_ppm);
+    return -1;
+  }
+
+  Pixel color = {.r = 0, .g = 0, .b = 0};
   Pixel black = {.r = 0, .g = 0, .b = 0};
 
-  Object **objects;
-  objects = malloc(sizeof(Object *) * 3);
-  objects[0] = malloc(sizeof(Object));
-
-  objects[0]->kind = 1;
-  objects[0]->Sphere.position[0] = 0;
-  objects[0]->Sphere.position[1] = 0;
-  objects[0]->Sphere.position[2] = 20;
-  objects[0]->Sphere.radius = 2;
-
-  objects[1] = NULL;
-
-  // objects[1] = malloc(sizeof(Object));
-  // objects[1]->plane.position[0] = 0;
-  // objects[1]->plane.position[1] = 1;
-  // objects[1]->plane.position[2] = 0;;
-  // objects[1]->plane.normal[0] = 4;
-  // objects[1]->plane.normal[1] = 10;
-  // objects[1]->plane.normal[2] = 1;
-
-  objects[2] = NULL;
+  Object **objects = read_scene(input_json);
 
   double cx = 0;
   double cy = 0;
   double h = 2;
   double w = 2;
 
-  int M = 2000;
-  int N = 2000;
+  int M = img_width;
+  int N = img_height;
 
   Pixel *buffer = malloc(M * N * sizeof(Pixel));
 
@@ -94,21 +92,35 @@ int main(int argc, char *argv[]) {
       double Ro[3] = {0, 0, 0};
       // Rd = normalize(P - Ro)
       double Rd[3] = {cx - (w / 2) + pixwidth * (x + 0.5),
-                      cy - (h / 2) + pixheight * (y + 0.5), 1};
+                      -(cy - (h / 2) + pixheight * (y + 0.5)), 1};
       normalize(Rd);
 
       double best_t = INFINITY;
-      for (int i = 0; objects[i] != 0; i += 1) {
-        double t = 0;
+      bool found_shape = false;
+      for (int i = 0; objects[i] != 0; i++) {
+        if (found_shape)
+          break;
 
-        switch (objects[i]->kind) {
-        case 0:
+        double t = 0;
+        switch (objects[i]->type) {
+        case PLANE:
           t = plane_intersection(Ro, Rd, objects[i]->Plane.position,
                                  objects[i]->Plane.normal);
+          if (t > 0 && t < best_t) {
+            found_shape = true;
+            color = objects[i]->color;
+          }
           break;
-        case 1:
+        case SPHERE:
           t = sphere_intersection(Ro, Rd, objects[i]->Sphere.position,
                                   objects[i]->Sphere.radius);
+
+          if (t > 0 && t < best_t) {
+            found_shape = true;
+            color = objects[i]->color;
+          }
+          break;
+        case CAMERA:
           break;
         default: // error
           exit(1);
@@ -126,8 +138,6 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  FILE *output_file = fopen("test.ppm", "w");
-
-  buffer_to_bin(buffer, M, N, output_file);
+  buffer_to_bin(buffer, M, N, output_ppm);
   return 0;
 }

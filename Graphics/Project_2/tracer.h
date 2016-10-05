@@ -1,3 +1,6 @@
+#ifndef _TRACER_H_
+#define _TRACER_H_
+
 /**
  * Simple Dictionary implementation in C
  *
@@ -5,13 +8,15 @@
  *
  */
 
+#include "pplib.h"
+
 const uint8_t CAMERA = 0;
 const uint8_t SPHERE = 1;
 const uint8_t PLANE = 2;
 
 typedef struct {
-  int kind;
-  double color[3];
+  int type;
+  Pixel color;
 
   union {
     struct {
@@ -31,3 +36,5 @@ typedef struct {
   };
 
 } Object;
+
+#endif
