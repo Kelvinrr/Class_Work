@@ -2,7 +2,7 @@
 CC = gcc
 TARGET = tracer
 
-CPPFLAGS = -g -Wall
+CFLAGS = -g -Wall
 
 .PHONY: default all clean
 
@@ -13,7 +13,7 @@ LIBS = -lm
 OBJECTS = $(patsubst %.cpp, %.o, $(wildcard *.cpp))
 
 %.o: %.c
-	$(CC) $(CPPFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(TARGET): $(OBJECTS) tracer.c
 	$(CC) tracer.c -Wall $(LIBS) -o $@
