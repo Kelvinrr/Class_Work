@@ -10,7 +10,6 @@ default: $(TARGET)
 all: default
 
 LIBS = -lm
-OBJECTS = $(patsubst %.cpp, %.o, $(wildcard *.cpp))
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
