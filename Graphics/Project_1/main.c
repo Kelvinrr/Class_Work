@@ -6,6 +6,7 @@
  *
  *
  */
+
 #define _GNU_SOURCE
 
 #include <stdbool.h>
@@ -185,8 +186,8 @@ int main(int argc, char *argv[]) {
 }
 
 size_t check_bin_image_size(size_t width, size_t height, FILE *file_to_check) {
-  fpos_t original_pos = 0;
-  fpos_t end_pos = 0;
+  fpos_t original_pos;
+  fpos_t end_pos;
 
   fgetpos(file_to_check, &original_pos);
   fseek(file_to_check, 0, SEEK_END);
@@ -203,7 +204,7 @@ size_t check_bin_image_size(size_t width, size_t height, FILE *file_to_check) {
 
 size_t check_ascii_image_size(size_t width, size_t height, char *buffer,
                               size_t size, FILE *file_to_check) {
-  fpos_t original_pos = 0;
+  fpos_t original_pos;
   char *token = NULL;
   size_t num_toks = 0;
 
@@ -268,7 +269,7 @@ void copy_data(char *buffer, size_t size, FILE *input_file, FILE *output_file) {
 }
 
 size_t size_to_endl(char *buffer, size_t size, FILE *const fin) {
-  fpos_t pos = 0;
+  fpos_t pos;
   int c = 0;
   int count = 0;
   count = 0;
