@@ -5,10 +5,9 @@
 
 #include "json_parser.h"
 
-#include "vector_math.h"
 #include "pplib.h"
 #include "tracer.h"
-
+#include "vector_math.h"
 
 int main(int argc, char *argv[]) {
   
@@ -21,6 +20,10 @@ int main(int argc, char *argv[]) {
   // get the width and height
   int img_width = strtol(argv[1], (char **)NULL, 10);
   int img_height = strtol(argv[2], (char **)NULL, 10);
+  
+  printf("%d\n", img_width);
+  printf("%d\n", img_height);
+  
   char *input_json = argv[3];
   
   // open the output file for reading
@@ -41,9 +44,9 @@ int main(int argc, char *argv[]) {
   double w = 2;
   int num_cams = 0;
   
-  // look for the camera
+  // look for the cameras
   for (int i = 0; objects[i] != 0; i++) {
-    if (objects[i]->type == 0) {
+    if (objects[i]->type == CAMERA) {
       w = objects[i]->Camera.width;
       h = objects[i]->Camera.height;
       num_cams++;
@@ -58,11 +61,23 @@ int main(int argc, char *argv[]) {
             num_cams);
   }
   
+  // look for all the lights
+  size_t num_lights = 0;
+  Object **lights = malloc(INIT_NUM_OBJ*sizeof(Object));
+  for (int i = 0; objects[i] != 0; i++) {
+    if (objects[i]->type == LIGHT) {
+      lights[num_lights] = objects[i];
+      num_lights++;
+    }
+  }
+  lights[num_lights] = NULL;
+  
+  
   // image variables
   double cx = 0;
   double cy = 0;
-  int M = img_width;
-  int N = img_height;
+  int N = img_width;
+  int M = img_height;
   
   // create the image buffer
   Pixel *buffer = malloc(M * N * sizeof(Pixel));
@@ -81,48 +96,117 @@ int main(int argc, char *argv[]) {
       double closest_t = INFINITY;
       size_t closest_object_idx = 0;
       
-      // find the nearest object and distance
+      // find the nearest object and distance ---------------
       for (int i = 0; objects[i] != 0; i++) {
-        double t = INFINITY;
-        
-        switch (objects[i]->type) {
-          case PLANE:
-            t = plane_intersection(Ro, Rd, objects[i]->Plane.position,
-                                   objects[i]->Plane.normal);
-            break;
-          case SPHERE:
-            t = sphere_intersection(Ro, Rd, objects[i]->Sphere.position,
-                                    objects[i]->Sphere.radius);
-            break;
-          case CAMERA:
-            continue;
-            break;
-          default: // error
-            exit(1);
-        } // end of switch
-        
+        double t = intersection_dist(Ro, Rd, objects[i]);
         if (t > 0 && t < closest_t) {
           closest_t = t;
           closest_object_idx = i;
         }
-      } // end of loop
-      
-      
-      
-      
-      color = objects[closest_object_idx]->color;
-      if (closest_t > 0 && closest_t != INFINITY) {
-        buffer[y * M + x] = color;
-      } else {
-        buffer[y * M + x] = bg_color;
       }
+      // ----------------------------------------------------
+      
+      Object* closest_object = objects[closest_object_idx];
+      
+      // get vector from surface of object to light sources
+      for (int j=0; j < num_lights; j+=1) {
+        // origin of vector pointing to light from surface
+        V3 Lo = malloc(3*sizeof(double));
+        closest_t = intersection_dist(Ro, Rd, closest_object);
+        v3_scale(Rd, closest_t-0.1, Lo);
+        
+        // direction of vector pointing to light from surface
+        V3 Ld = malloc(3*sizeof(double));
+        v3_subtract(lights[j]->Light.position, Lo, Ld);
+        
+        
+        double distance_to_light = v3_magnitude(Ld);
+        
+        Object* closest_shadow_object = NULL;
+        double closest_shadow_t = INFINITY;
+        // check lighting --------------------------------------
+        for (int k = 0; objects[k] != 0; k++) {
+          
+          double t = intersection_dist(Lo, Ld, objects[k]);
+          if (t > 0 && t < closest_t) {
+            closest_shadow_t = t;
+            closest_shadow_object = objects[k];
+          }
+        }
+        // lighting is found ----------------------------------
+      
+        
+        // compute final pixel color
+        if (closest_shadow_object == NULL) {
+          normalize(Rd);
+          normalize(Ld);
+          
+          Pixel diffuse_color = (closest_object->type == SPHERE) ?
+          closest_object->Sphere.diffuse_color :
+          closest_object->Plane.diffuse_color;
+          
+          Pixel specular_color = (closest_object->type == SPHERE) ?
+          closest_object->Sphere.sepcular_color :
+          closest_object->Plane.sepcular_color;
+         
+
+          // get the surface normal
+          V3 normal;
+          if (closest_object->type == PLANE) {
+            normal = closest_object->Plane.normal;
+          }
+          else {
+            normal = malloc(3*sizeof(double));
+            v3_subtract(Lo, closest_object->Sphere.position, normal);
+          }
+          
+          normalize(normal);
+          // get the vector aiming towards the light
+          V3 L = Ld;
+          
+          // reflect it relative to the normal
+          // formula: r = L−2(L⋅n)n
+          V3 R = malloc(3*sizeof(double));
+          v3_scale(normal, 2*v3_dot(L, normal), R);
+          v3_subtract(L, R, R);
+          normalize(R);
+          
+          // Compute the angle values
+          double diffuse_coeff = v3_dot(L, normal);
+          double specular_coeff = pow(v3_dot(R, Rd), 1);
+          double k1 = .5;
+          double k2 = .125;
+          double k3 = .125;
+          
+//          printf("%f\n", diffuse_color.r);
+//          printf("%f\n", diffuse_color.g);
+//          printf("%f\n", diffuse_color.b);
+          color.r = (diffuse_coeff * diffuse_color.r * lights[j]->Light.color.r) + specular_coeff * specular_color.r * lights[j]->Light.color.r;
+          color.g = (diffuse_coeff * diffuse_color.g * lights[j]->Light.color.g) + specular_coeff * specular_color.g * lights[j]->Light.color.g;
+          color.b = (diffuse_coeff * diffuse_color.b * lights[j]->Light.color.b) + specular_coeff * specular_color.b * lights[j]->Light.color.b;
+          
+          if(distance_to_light < 0 && distance_to_light >= INFINITY){
+            distance_to_light = 1;
+          }
+          color.r /= (pow(k1,2)*distance_to_light + k2*distance_to_light + k3);
+          color.g /=  (pow(k1,2)*distance_to_light + k2*distance_to_light + k3);
+          color.b /=  (pow(k1,2)*distance_to_light + k2*distance_to_light + k3);
+        }
+        else{
+          color = bg_color;
+        }
+      } // end of light source loop
       
       
-      
-      
+      // put the final color into the buffer
+
+        buffer[(y * N) + x].r = (uint8_t)(255 * clamp(color.r));
+        buffer[(y * N) + x].g = (uint8_t)(255 * clamp(color.g));
+        buffer[(y * N) + x].b = (uint8_t)(255 * clamp(color.b));
+
     }  // end of N loop
   }  // end of M loop
   
-  buffer_to_bin(buffer, M, N, output_ppm);
+  buffer_to_bin(buffer, N, M, output_ppm);
   return 0;
 }

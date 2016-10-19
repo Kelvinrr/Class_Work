@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct { uint8_t r, g, b; } Pixel;
+typedef struct { float r, g, b; } Pixel;
 
 void buffer_to_bin(Pixel *buffer, size_t width, size_t height,
                    FILE *output_file) {
@@ -19,6 +19,10 @@ void buffer_to_bin(Pixel *buffer, size_t width, size_t height,
     fputc(buffer[i].g, output_file);
     fputc(buffer[i].b, output_file);
   }
+}
+
+float clamp(float val) {
+  return (val < 0.0) ? 0 : (val > 1) ? 1.0 : val;
 }
 
 #endif
