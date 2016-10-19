@@ -109,10 +109,10 @@ double *next_vector(FILE *json) {
 }
 
 /**
+ * Procedure to parse JSON and store them
+ * in an object array.
  *
- *
- *
- *
+ * Returns: Array of Object types
  */
 Object **read_scene(char *filename) {
   int c;
