@@ -134,10 +134,9 @@ int main(int argc, char *argv[]) {
         // direction of vector pointing to light from surface
         V3 Ld = malloc(3*sizeof(double));
         v3_subtract(lights[j]->Light.position, Lo, Ld);
-      
-        normalize(Ld);
         
         double distance_to_light = v3_magnitude(Ld);
+        normalize(Ld);
         
         Object* closest_shadow_object = NULL;
         double closest_shadow_t = distance_to_light;
@@ -182,6 +181,9 @@ int main(int argc, char *argv[]) {
         v3_scale(normal, 2*v3_dot(L, normal), R);
         v3_subtract(L, R, R);
         normalize(R);
+        
+        double diffuse_coeff = v3_dot(L, normal);
+        double specular_coeff = (closest_shadow_object == NULL) ? pow(v3_dot(R, Rd), 100) : 0;
 
         // light computation for spot lights
         double Fang = 1;
@@ -200,10 +202,7 @@ int main(int argc, char *argv[]) {
             Fang = pow(cos_angle, lights[j]->Light.angular_a0);
           }
         }
-        
-        double diffuse_coeff = v3_dot(L, normal);
-        double specular_coeff = (closest_shadow_object == NULL) ? pow(v3_dot(R, Rd), 100) : 0;
-        
+      
         double k1 = lights[j]->Light.radial_a0;
         double k2 = lights[j]->Light.radial_a1;
         double k3 = lights[j]->Light.radial_a2;
