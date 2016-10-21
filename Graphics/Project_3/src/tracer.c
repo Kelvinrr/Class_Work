@@ -9,6 +9,21 @@
 #include "tracer.h"
 #include "vector_math.h"
 
+bool is_object_equal(Object* first, Object* second){
+  if (first->type != second->type){
+    return false;
+  }
+  
+  if (first->type == SPHERE){
+    return first->Sphere.position == second->Sphere.position;
+  } else if (first->type == PLANE){
+    return first->Plane.position == second->Sphere.position;
+  } else {
+    return false;
+  }
+}
+
+
 int main(int argc, char *argv[]) {
   
   // check if args are within range
@@ -88,6 +103,7 @@ int main(int argc, char *argv[]) {
   // Start processing the image
   for (int y = 0; y < M; y += 1) {
     for (int x = 0; x < N; x += 1) {
+      color = bg_color;
       double Ro[3] = {0, 0, 0};
       double Rd[3] = {cx - (w / 2) + pixwidth * (x + 0.5),
         -(cy - (h / 2) + pixheight * (y + 0.5)), 1};
@@ -118,92 +134,96 @@ int main(int argc, char *argv[]) {
         // direction of vector pointing to light from surface
         V3 Ld = malloc(3*sizeof(double));
         v3_subtract(lights[j]->Light.position, Lo, Ld);
-        
+      
+        normalize(Ld);
         
         double distance_to_light = v3_magnitude(Ld);
         
         Object* closest_shadow_object = NULL;
-        double closest_shadow_t = INFINITY;
+        double closest_shadow_t = distance_to_light;
+        
         // check lighting --------------------------------------
         for (int k = 0; objects[k] != 0; k++) {
           
           double t = intersection_dist(Lo, Ld, objects[k]);
-          if (t > 0 && t < closest_t) {
+          if (t > 0 && t < closest_t && t < distance_to_light) {
             closest_shadow_t = t;
             closest_shadow_object = objects[k];
           }
         }
-        // lighting is found ----------------------------------
-      
         
-        // compute final pixel color
-        if (closest_shadow_object == NULL) {
-          normalize(Rd);
-          normalize(Ld);
-          
-          Pixel diffuse_color = (closest_object->type == SPHERE) ?
-          closest_object->Sphere.diffuse_color :
-          closest_object->Plane.diffuse_color;
-          
-          Pixel specular_color = (closest_object->type == SPHERE) ?
-          closest_object->Sphere.sepcular_color :
-          closest_object->Plane.sepcular_color;
-         
+        // lighting is found ----------------------------------
+        
+        Pixel diffuse_color = (closest_object->type == SPHERE) ?
+        closest_object->Sphere.diffuse_color :
+        closest_object->Plane.diffuse_color;
+        
+        Pixel specular_color = (closest_object->type == SPHERE) ?
+        closest_object->Sphere.sepcular_color :
+        closest_object->Plane.sepcular_color;
+        
+        // get the surface normal
+        V3 normal;
+        if (closest_object->type == PLANE) {
+          normal = closest_object->Plane.normal;
+        }
+        else {
+          normal = malloc(3*sizeof(double));
+          v3_subtract(Lo, closest_object->Sphere.position, normal);
+        }
+        
+        normalize(normal);
+        // get the vector aiming towards the light
+        V3 L = Ld;
+        
+        // reflect it relative to the normal
+        // formula: r = L−2(L⋅n)n
+        V3 R = malloc(3*sizeof(double));
+        v3_scale(normal, 2*v3_dot(L, normal), R);
+        v3_subtract(L, R, R);
+        normalize(R);
 
-          // get the surface normal
-          V3 normal;
-          if (closest_object->type == PLANE) {
-            normal = closest_object->Plane.normal;
+        // light computation for spot lights
+        double Fang = 1;
+        if (lights[j]->Light.is_spot) {
+          normalize(lights[j]->Light.dirction);
+          
+          V3 scaled = malloc(3*sizeof(double));
+          v3_scale(L, -1, scaled);
+          
+          double cos_angle = v3_dot(lights[j]->Light.dirction, scaled);
+          double angle = acos(cos_angle);
+          if (angle > lights[j]->Light.theta) {
+            Fang = 0;
           }
           else {
-            normal = malloc(3*sizeof(double));
-            v3_subtract(Lo, closest_object->Sphere.position, normal);
+            Fang = pow(cos_angle, lights[j]->Light.angular_a0);
           }
-          
-          normalize(normal);
-          // get the vector aiming towards the light
-          V3 L = Ld;
-          
-          // reflect it relative to the normal
-          // formula: r = L−2(L⋅n)n
-          V3 R = malloc(3*sizeof(double));
-          v3_scale(normal, 2*v3_dot(L, normal), R);
-          v3_subtract(L, R, R);
-          normalize(R);
-          
-          // Compute the angle values
-          double diffuse_coeff = v3_dot(L, normal);
-          double specular_coeff = pow(v3_dot(R, Rd), 1);
-          double k1 = .5;
-          double k2 = .125;
-          double k3 = .125;
-          
-//          printf("%f\n", diffuse_color.r);
-//          printf("%f\n", diffuse_color.g);
-//          printf("%f\n", diffuse_color.b);
-          color.r = (diffuse_coeff * diffuse_color.r * lights[j]->Light.color.r) + specular_coeff * specular_color.r * lights[j]->Light.color.r;
-          color.g = (diffuse_coeff * diffuse_color.g * lights[j]->Light.color.g) + specular_coeff * specular_color.g * lights[j]->Light.color.g;
-          color.b = (diffuse_coeff * diffuse_color.b * lights[j]->Light.color.b) + specular_coeff * specular_color.b * lights[j]->Light.color.b;
-          
-          if(distance_to_light < 0 && distance_to_light >= INFINITY){
-            distance_to_light = 1;
-          }
-          color.r /= (pow(k1,2)*distance_to_light + k2*distance_to_light + k3);
-          color.g /=  (pow(k1,2)*distance_to_light + k2*distance_to_light + k3);
-          color.b /=  (pow(k1,2)*distance_to_light + k2*distance_to_light + k3);
         }
-        else{
+        
+        double diffuse_coeff = v3_dot(L, normal);
+        double specular_coeff = (closest_shadow_object == NULL) ? pow(v3_dot(R, Rd), 100) : 0;
+        
+        double k1 = lights[j]->Light.radial_a0;
+        double k2 = lights[j]->Light.radial_a1;
+        double k3 = lights[j]->Light.radial_a2;
+        double k = 1/(pow(k1,2)*distance_to_light + k2*distance_to_light + k3);
+        
+        color.r += ((diffuse_color.r * diffuse_coeff) + (specular_coeff * specular_color.r)) * lights[j]->Light.color.r * k * Fang;
+        color.g += ((diffuse_color.g * diffuse_coeff) + (specular_coeff * specular_color.g)) * lights[j]->Light.color.g * k * Fang;
+        color.b += ((diffuse_color.b * diffuse_coeff) + (specular_coeff * specular_color.b)) * lights[j]->Light.color.b * k * Fang;
+        
+        if(closest_shadow_object != NULL && !is_object_equal(closest_shadow_object, closest_object)) {
           color = bg_color;
         }
       } // end of light source loop
       
-      
       // put the final color into the buffer
-
-        buffer[(y * N) + x].r = (uint8_t)(255 * clamp(color.r));
-        buffer[(y * N) + x].g = (uint8_t)(255 * clamp(color.g));
-        buffer[(y * N) + x].b = (uint8_t)(255 * clamp(color.b));
-
+      
+      buffer[(y * N) + x].r = (uint8_t)(255 * clamp(color.r));
+      buffer[(y * N) + x].g = (uint8_t)(255 * clamp(color.g));
+      buffer[(y * N) + x].b = (uint8_t)(255 * clamp(color.b));
+      
     }  // end of N loop
   }  // end of M loop
   

@@ -55,6 +55,7 @@ typedef struct {
       double radial_a2;
       
       double position[3];
+      bool is_spot;
     } Light;
   };
 

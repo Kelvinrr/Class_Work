@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<head>
+    <title>Contact</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../style/contact.css">
+</head>
+
+<body>
+  <div class="header-links">
+      <a href="../index.html">HOME</a>
+      <a href="apology.html">APOLOGY</a>
+      <a href="resume.html">RESUME</a>
+      <a href="contact.html">CONTACT</a>
+      <a href="pages/sidebar.html">SIDEBAR</a>
+  </div>
+</BODY>
+
+    <form id="contact-form" method="post" action="contact.html" role="form">
+        <div class="messages"></div>
+        <div class="controls">
+            <div class="row row-centered">
+                <div class="col-md-4 col-centered">
+                    <div class="form-group">
+                        <label for="form_name">Firstname *</label>
+                        <input id="form_name" type="text" name="name" class="form-control" placeholder="Please enter your firstname *" required="required" data-error="Firstname is required.">
+                        <div class="help-block with-errors"></div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-centered">
+                    <div class="form-group">
+                        <label for="form_lastname">Lastname *</label>
+                        <input id="form_lastname" type="text" name="surname" class="form-control" placeholder="Please enter your lastname *" required="required" data-error="Lastname is required.">
+                        <div class="help-block with-errors"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row row-centered">
+                <div class="col-md-4 col-centered">
+                    <div class="form-group">
+                        <label for="form_email">Email *</label>
+                        <input id="form_email" type="email" name="email" class="form-control" placeholder="Please enter your email *" required="required" data-error="Valid email is required.">
+                        <div class="help-block with-errors"></div>
+                        <div class="radio">
+                          <label><input type="radio" name="optradio">QUESTION &nbsp;</label>
+                          <label><input type="radio" name="optradio">COMMENT &nbsp;</label>
+                          <label><input type="radio" name="optradio">URGENT &nbsp;</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-centered">
+                    <div class="form-group">
+                        <label for="form_phone">Phone</label>
+                        <input id="form_phone" type="tel" name="phone" class="form-control" placeholder="Please enter your phone">
+                        <div class="help-block with-errors"></div>
+                        <label class="checkbox-inline"><input type="checkbox" value="">I Want An Email Response</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row row-centered">
+                <div class="col-md-8 col-centered">
+                    <div class="form-group">
+                        <label for="form_message">Message *</label>
+                        <textarea id="form_message" name="message" class="form-control" placeholder="Message for me *" rows="8" required="required" data-error="Please,leave us a message."></textarea>
+                        <div class="help-block with-errors"></div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <input type="submit" class="btn btn-success btn-send" value="Submit">
+                </div>
+            </div>
+            <div class="row row-centered">
+                <div class="col-md-8 col-centered">
+                    <p class="text-muted"><strong>*</strong>Required Fields.</p>
+                </div>
+            </div>
+        </div>
+    </form>
+</body>
+
+</html>

@@ -14,6 +14,12 @@ static inline void v3_add(V3 a, V3 b, V3 c) {
   c[2] = a[2] + b[2];
 }
 
+static inline bool v3_equal(V3 a, V3 b) {
+  return a[0] == b[0] &&
+         a[1] == b[1] &&
+         a[2] == b[2];
+}
+
 static inline double v3_magnitude(V3 v){
   return sqrt(sqr(v[0]) + sqr(v[1]) + sqr(v[2]));
 }

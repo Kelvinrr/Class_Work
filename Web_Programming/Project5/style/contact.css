@@ -1,0 +1,32 @@
+body {
+  /*background-color: #340069;*/
+}
+
+.row-centered {
+    text-align: center;
+}
+
+.col-centered {
+  display: inline-block;
+  float: none;
+  text-align: left;
+}
+
+.header-links {
+  word-spacing: 100px;
+  text-align: center;
+  margin-left: -50%;
+  margin-right: -50%;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: lighter;
+  margin-bottom: 5%;
+  margin-top: 1%;
+}
+
+.header-links a{
+  color: #340069;
+  font-size: 75%;
+}
+
+.radio {
+}

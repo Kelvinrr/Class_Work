@@ -126,6 +126,7 @@ Object **read_scene(char *filename) {
   Object **obj_array;
   obj_array = malloc(sizeof(Object *) * INIT_NUM_OBJ);
   
+  
   skip_ws(json);
   
   // Find the beginning of the list
@@ -167,6 +168,7 @@ Object **read_scene(char *filename) {
         obj_array[curr_obj]->type = PLANE;
       } else if (strcmp(value, "light") == 0) {
         obj_array[curr_obj]->type = LIGHT;
+        obj_array[curr_obj]->Light.is_spot = false;
       } else {
         fprintf(stderr, "Error: Unknown type, \"%s\", on line number %d.\n",
                 value, line);
@@ -226,7 +228,6 @@ Object **read_scene(char *filename) {
             
           } else if (strcmp(key, "theta") == 0) {
             double value = next_number(json);
-            value = fmod(value, (2.0 * M_PI));
             obj_array[curr_obj]->Light.theta = value;
             
           } else if (strcmp(key, "angular-a0") == 0) {
@@ -363,6 +364,8 @@ Object **read_scene(char *filename) {
             v3_cpy(obj_array[curr_obj]->Plane.normal, value);
           } else if (strcmp(key, "direction") == 0) {
             double *value = next_vector(json);
+            obj_array[curr_obj]->Light.is_spot = true;
+            normalize(value);
             v3_cpy(obj_array[curr_obj]->Light.dirction, value);
           } else {
             fprintf(stderr, "Error: Unknown property, \"%s\", on line %d.\n",
