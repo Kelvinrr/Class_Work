@@ -15,7 +15,7 @@ SRC = -Isrc/
 LIBS = -lm
 
 %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -Iinclude $(SRC) -c $< -o $@
+	$(CC) $(CFLAGS) $(INCLUDES) $(SRC) -c $< -o $@
 
 $(TARGET): $(OBJECTS) src/tracer.c
 	$(CC) src/tracer.c -Wall $(LIBS) $(INCLUDES) -o $@

@@ -4,7 +4,6 @@
 #include <stdlib.h>
 
 #include "json_parser.h"
-
 #include "pplib.h"
 #include "tracer.h"
 #include "vector_math.h"

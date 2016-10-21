@@ -1,10 +1,10 @@
 #ifndef _VECTORMATH_H_
 #define _VECTORMATH_H_
 
-#include <math.h>
-#include "tracer.h"
+typedef double *V3;
 
-typedef double* V3;
+#include "tracer.h"
+#include <math.h>
 
 static inline double sqr(double v) { return v * v; }
 
@@ -15,12 +15,10 @@ static inline void v3_add(V3 a, V3 b, V3 c) {
 }
 
 static inline bool v3_equal(V3 a, V3 b) {
-  return a[0] == b[0] &&
-         a[1] == b[1] &&
-         a[2] == b[2];
+  return a[0] == b[0] && a[1] == b[1] && a[2] == b[2];
 }
 
-static inline double v3_magnitude(V3 v){
+static inline double v3_magnitude(V3 v) {
   return sqrt(sqr(v[0]) + sqr(v[1]) + sqr(v[2]));
 }
 
@@ -63,35 +61,39 @@ static inline void normalize(double *v) {
  * Simple function that calculates the intersection with a
  * sphere. Based on the formula found in the text
  * provided by the class */
-static inline double sphere_intersection(double *Ro, double *Rd, double *center, double r) {
+static inline double sphere_intersection(double *Ro, double *Rd, double *center,
+                                         double r) {
   // Algorithm:
   //   A*t^2 + B*t + C = 0
   //   a = dx*dx + dy*dy + dz*dz;
   //   b = 2*dx*(x0-cx) +  2*dy*(y0-cy) +  2*dz*(z0-cz);
-  //   c = cx*cx + cy*cy + cz*cz + x0*x0 + y0*y0 + z0*z0 -2*(cx*x0 + cy*y0 + cz*z0) - R*R;
+  //   c = cx*cx + cy*cy + cz*cz + x0*x0 + y0*y0 + z0*z0 -2*(cx*x0 + cy*y0 +
+  //   cz*z0) - R*R;
   //   det
   //   t0, t1 = (- B + (det)^1/2) / 2 * A where t0 is for (-) and t1 is for (+)
-  
+
   double A = (sqr(Rd[0]) + sqr(Rd[1]) + sqr(Rd[2]));
-  
-  double B = 2 * Rd[0] * (Ro[0] - center[0]) + 2 * Rd[1] * (Ro[1] - center[1]) + 2 * Rd[2]
-               * (Ro[2] - center[2]);
-  
-  double C = sqr(center[0]) + sqr(center[1]) + sqr(center[2]) + sqr(Ro[0]) + sqr(Ro[1]) + sqr(Ro[2])
-                  -2 * (center[0] * Ro[0] + center[1] * Ro[1] + center[2] * Ro[2]) - sqr(r);
-  
+
+  double B = 2 * Rd[0] * (Ro[0] - center[0]) + 2 * Rd[1] * (Ro[1] - center[1]) +
+             2 * Rd[2] * (Ro[2] - center[2]);
+
+  double C = sqr(center[0]) + sqr(center[1]) + sqr(center[2]) + sqr(Ro[0]) +
+             sqr(Ro[1]) + sqr(Ro[2]) -
+             2 * (center[0] * Ro[0] + center[1] * Ro[1] + center[2] * Ro[2]) -
+             sqr(r);
+
   double det = sqr(B) - 4 * A * C;
-  if(det < 0)
+  if (det < 0)
     return -1;
-  
-  double t0 = (-B - sqrt(det)) / (2*A);
+
+  double t0 = (-B - sqrt(det)) / (2 * A);
   if (t0 > 0)
     return t0;
-  
-  double t1 = (-B + sqrt(det)) / (2*A);
+
+  double t1 = (-B + sqrt(det)) / (2 * A);
   if (t1 > 0)
     return t1;
-  
+
   return -1;
 }
 
@@ -99,54 +101,21 @@ static inline double sphere_intersection(double *Ro, double *Rd, double *center,
  * Simple function that calculates the intersection with a
  * plane. Based on the formula found in the text
  * provided by the class */
-static inline double plane_intersection(double *Ro, double *Rd, double *position,
-                          double *normal) {
-  
+static inline double plane_intersection(double *Ro, double *Rd,
+                                        double *position, double *normal) {
+
   V3 temp = malloc(sizeof(double) * 3);
   v3_subtract(Ro, position, temp);
-  
+
   double distance = v3_dot(normal, temp);
   double denominator = v3_dot(normal, Rd);
-  
+
   distance = -(distance / denominator);
-  
+
   if (distance > 0)
     return distance;
-  
+
   return 0;
 }
-
-/**
- * Calulates intersection between objects 
- * given Ray origin, direction, and Object to calculate 
- * the intersection of. */
-static inline double intersection_dist(V3 Ro, V3 Rd, Object* object) {
-  double t = INFINITY;
-  
-  switch (object->type) {
-    case PLANE:
-      t = plane_intersection(Ro, Rd, object->Plane.position,
-                             object->Plane.normal);
-      break;
-    case SPHERE:
-      t = sphere_intersection(Ro, Rd, object->Sphere.position,
-                              object->Sphere.radius);
-      break;
-    case CAMERA:
-      t = INFINITY;
-      break;
-    case LIGHT:
-      t = INFINITY;
-      break;
-    default: // error
-      fprintf(stderr, "Error: Unknown type when finding intersections.\n");
-      exit(1);
-  } // end of switch
-  
-  return t;
-}
-
-
-
 
 #endif

@@ -2,14 +2,14 @@
 #define _VECTOR_MATH_H_
 
 #include <ctype.h>
+#include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 
-#include "vector_math.h"
 #include "tracer.h"
+#include "vector_math.h"
 
 int line = 1;
 const uint8_t INIT_NUM_OBJ = 64;
@@ -65,7 +65,7 @@ char *next_string(FILE *json) {
   while (c != '"') {
     if (i >= 128) {
       fprintf(stderr, "Error: Strings longer than 128 characters in length are "
-              "not supported.\n");
+                      "not supported.\n");
       exit(1);
     }
     if (c == '\\') {
@@ -122,21 +122,20 @@ Object **read_scene(char *filename) {
     fprintf(stderr, "Error: Could not open file \"%s\"\n", filename);
     exit(1);
   }
-  
+
   Object **obj_array;
   obj_array = malloc(sizeof(Object *) * INIT_NUM_OBJ);
-  
-  
+
   skip_ws(json);
-  
+
   // Find the beginning of the list
   expect_c(json, '[');
   skip_ws(json);
-  
+
   size_t curr_obj = 0;
   while (1) {
     obj_array[curr_obj] = malloc(sizeof(Object));
-    
+
     c = fgetc(json);
     if (c == ']') {
       fprintf(stderr, "Error: This is the worst scene file EVER.\n");
@@ -145,7 +144,7 @@ Object **read_scene(char *filename) {
     }
     if (c == '{') {
       skip_ws(json);
-      
+
       // Parse the object
       char *key = next_string(json);
       if (strcmp(key, "type") != 0) {
@@ -153,13 +152,13 @@ Object **read_scene(char *filename) {
                 line);
         exit(1);
       }
-      
+
       skip_ws(json);
       expect_c(json, ':');
       skip_ws(json);
-      
+
       char *value = next_string(json);
-      
+
       if (strcmp(value, "camera") == 0) {
         obj_array[curr_obj]->type = CAMERA;
       } else if (strcmp(value, "sphere") == 0) {
@@ -174,9 +173,9 @@ Object **read_scene(char *filename) {
                 value, line);
         exit(1);
       }
-      
+
       skip_ws(json);
-      
+
       while (1) {
         c = next_c(json);
         if (c == '}') {
@@ -189,126 +188,128 @@ Object **read_scene(char *filename) {
           skip_ws(json);
           expect_c(json, ':');
           skip_ws(json);
-          
+
           // Start storing values
-          
+
           // Scaler types
           if (strcmp(key, "width") == 0) {
             double value = next_number(json);
             if (value < 0) {
               fprintf(stderr, "Error: Width cannot be less than 0. Found %lf "
-                      "on line number %d.\n",
+                              "on line number %d.\n",
                       value, line);
               exit(1);
             }
-            
+
             obj_array[curr_obj]->Camera.width = value;
-            
+
           } else if (strcmp(key, "height") == 0) {
             double value = next_number(json);
             if (value < 0) {
               fprintf(stderr, "Error: Height cannot be less than 0. Found %lf "
-                      "on line number %d.\n",
+                              "on line number %d.\n",
                       value, line);
               exit(1);
             }
-            
+
             obj_array[curr_obj]->Camera.height = value;
-            
+
           } else if (strcmp(key, "radius") == 0) {
             double value = next_number(json);
             if (value < 0) {
               fprintf(stderr, "Error: Radius cannot be less than 0. Found %lf "
-                      "on line number %d.\n",
+                              "on line number %d.\n",
                       value, line);
               exit(1);
             }
-            
+
             obj_array[curr_obj]->Sphere.radius = value;
-            
+
           } else if (strcmp(key, "theta") == 0) {
             double value = next_number(json);
-            obj_array[curr_obj]->Light.theta = value;
-            
+            obj_array[curr_obj]->Light.theta = value * (M_PI / 180);
+
           } else if (strcmp(key, "angular-a0") == 0) {
             double value = next_number(json);
             if (value < 0) {
-              fprintf(stderr, "Error: Angular-a0 cannot be less than 0. Found %lf "
+              fprintf(stderr,
+                      "Error: Angular-a0 cannot be less than 0. Found %lf "
                       "on line number %d.\n",
                       value, line);
               exit(1);
             }
-            
-            
+
             obj_array[curr_obj]->Light.angular_a0 = value;
-            
+
           } else if (strcmp(key, "radial-a0") == 0) {
             double value = next_number(json);
             if (value < 0) {
-              fprintf(stderr, "Error: Radial-a0 cannot be less than 0. Found %lf "
+              fprintf(stderr,
+                      "Error: Radial-a0 cannot be less than 0. Found %lf "
                       "on line number %d.\n",
                       value, line);
               exit(1);
             }
-            
-            
+
             obj_array[curr_obj]->Light.angular_a0 = value;
-            
+
           } else if (strcmp(key, "radial-a1") == 0) {
             double value = next_number(json);
             if (value < 0) {
-              fprintf(stderr, "Error: Radial-a1 cannot be less than 0. Found %lf "
+              fprintf(stderr,
+                      "Error: Radial-a1 cannot be less than 0. Found %lf "
                       "on line number %d.\n",
                       value, line);
               exit(1);
             }
-            
+
             obj_array[curr_obj]->Light.radial_a1 = value;
-            
+
           } else if (strcmp(key, "radial-a2") == 0) {
             double value = next_number(json);
             if (value < 0) {
-              fprintf(stderr, "Error: Radial-a2 cannot be less than 0. Found %lf "
+              fprintf(stderr,
+                      "Error: Radial-a2 cannot be less than 0. Found %lf "
                       "on line number %d.\n",
                       value, line);
               exit(1);
             }
-            
+
             obj_array[curr_obj]->Light.radial_a2 = value;
-            
+
           }
-          
+
           // Vector types
           else if (strcmp(key, "color") == 0) {
             double *value = next_vector(json);
             if (value[0] < 0 || value[1] < 0 || value[2] < 0) {
               fprintf(stderr, "Error: color values cannot be less than 0. "
-                      "On line number %d.\n",
+                              "On line number %d.\n",
                       line);
               exit(1);
             }
-            
+
             if (obj_array[curr_obj]->type != LIGHT) {
-              fprintf(stderr, "Error: Object does not support a plain color attribute. "
+              fprintf(stderr,
+                      "Error: Object does not support a plain color attribute. "
                       "On line number %d.\n",
                       line);
               exit(1);
             }
-            
-            
+
             obj_array[curr_obj]->Light.color.r = value[0];
             obj_array[curr_obj]->Light.color.g = value[1];
             obj_array[curr_obj]->Light.color.b = value[2];
           } else if (strcmp(key, "specular_color") == 0) {
             double *value = next_vector(json);
-            
+
             if (value[0] < 0 || value[1] < 0 || value[2] < 0) {
               fprintf(stderr, "Error: color values cannot be less than 0. "
-                      "On line number %d.\n",
+                              "On line number %d.\n",
                       line);
               exit(1);
             }
-            
+
             if (obj_array[curr_obj]->type == SPHERE) {
               obj_array[curr_obj]->Sphere.sepcular_color.r = value[0];
               obj_array[curr_obj]->Sphere.sepcular_color.g = value[1];
@@ -319,21 +320,21 @@ Object **read_scene(char *filename) {
               obj_array[curr_obj]->Plane.sepcular_color.b = value[2];
             } else {
               fprintf(stderr, "Error: Object does not support specular color. "
-                      "On line number %d.\n",
+                              "On line number %d.\n",
                       line);
               exit(1);
             }
-            
+
           } else if (strcmp(key, "diffuse_color") == 0) {
             double *value = next_vector(json);
-            
+
             if (value[0] < 0 || value[1] < 0 || value[2] < 0) {
               fprintf(stderr, "Error: color values cannot be less than 0. "
-                      "On line number %d.\n",
+                              "On line number %d.\n",
                       line);
               exit(1);
             }
-            
+
             if (obj_array[curr_obj]->type == SPHERE) {
               obj_array[curr_obj]->Sphere.diffuse_color.r = value[0];
               obj_array[curr_obj]->Sphere.diffuse_color.g = value[1];
@@ -344,14 +345,14 @@ Object **read_scene(char *filename) {
               obj_array[curr_obj]->Plane.diffuse_color.b = value[2];
             } else {
               fprintf(stderr, "Error: Object does not support diffuse color. "
-                      "On line number %d.\n",
+                              "On line number %d.\n",
                       line);
               exit(1);
             }
-            
+
           } else if (strcmp(key, "position") == 0) {
             double *value = next_vector(json);
-            
+
             if (obj_array[curr_obj]->type == PLANE) {
               v3_cpy(obj_array[curr_obj]->Plane.position, value);
             } else if (obj_array[curr_obj]->type == SPHERE) {
@@ -372,14 +373,14 @@ Object **read_scene(char *filename) {
                     key, line);
             exit(1);
           }
-          
+
           skip_ws(json);
         } else {
           fprintf(stderr, "Error: Unexpected value on line %d\n", line);
           exit(1);
         }
       }
-      
+
       skip_ws(json);
       c = next_c(json);
       if (c == ',') {
